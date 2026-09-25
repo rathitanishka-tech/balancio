@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * LIQUID OBSIDIAN — design tokens
+ * ---------------------------------------------------------------------
+ * Single source of truth for the palette. Tailwind reads these via
+ * tailwind.config.ts (colors.bg/surface/ink/line/accent all point at
+ * these variables), so any component using bg-surface-1, text-ink-secondary,
+ * border-line-subtle, etc. stays in sync automatically.
+ *
+ * The base/surface/text/border values are exactly the hex codes the spec
+ * specified. The four accent categories it named (Violet/Indigo, Cyan,
+ * Emerald, Soft Blue) didn't come with exact hex values, so this is this
+ * implementation's concrete choice for them — tuned to stay legible on the
+ * near-black surfaces above without turning neon.
+ */
+:root {
+  /* LIGHT MODE TOKENS */
+  --bg-base: #f7f8fa;
+  --bg-elevated: #ffffff;
+  --bg-alt: #eef1f5;
+
+  --surface-1: rgba(255, 255, 255, 0.65);
+  --surface-2: rgba(255, 255, 255, 0.85);
+  --surface-3: #ffffff;
+
+  --text-primary: #111318;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+
+  --accent-violet: #6d28d9;
+  --accent-indigo: #4f46e5;
+  --accent-cyan: #0891b2;
+  --accent-emerald: #059669;
+  --accent-blue: #2563eb;
+  --accent-rose: #e11d48;
+}
+
+.dark {
+  /* DARK MODE TOKENS */
+  --bg-base: #050505;
+  --bg-elevated: #08090b;
+  --bg-alt: #0d0f12;
+
+  --surface-1: #111318;
+  --surface-2: #15171c;
+  --surface-3: #191c22;
+
+  --text-primary: #f5f5f5;
+  --text-secondary: #9a9fa8;
+  --text-muted: #646972;
+
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.1);
+
+  --accent-violet: #7c6cf5;
+  --accent-indigo: #6366f1;
+  --accent-cyan: #22d3ee;
+  --accent-emerald: #34d399;
+  --accent-blue: #60a5fa;
+  --accent-rose: #fb7185;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle, static film-grain-style noise. Purely decorative, pointer-events
+   disabled, and skipped entirely under prefers-reduced-motion since even a
+   static overlay can read as "busy" to sensitive users. */
+.bg-noise {
+  position: relative;
+  isolation: isolate;
+}
+.bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Glass surface primitive - used by GlassCard/GlassPanel/GlassModal/etc. */
+.glass-surface {
+  background-color: color-mix(in srgb, var(--surface-1) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-surface-strong {
+  background-color: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid var(--border-strong);
+}
+
+/* Thin liquid sheen highlight, meant to sit inside a `relative overflow-hidden` container. */
+.liquid-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.group:hover .liquid-sheen,
+.liquid-sheen-active {
+  opacity: 1;
+}
+
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent-violet);
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--accent-violet) 35%, transparent);
+  color: var(--text-primary);
+}
+
+/* Scrollbar styling - subtle, dark, matches the palette rather than the
+   browser default light scrollbar. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .bg-noise::before {
+    display: none;
+  }
+}
