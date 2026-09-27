@@ -5,7 +5,7 @@
   "description": "Liquid Obsidian frontend for the Splitwise-style expense-sharing app",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm install --prefix ../backend && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
