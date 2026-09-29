@@ -1,22 +1,45 @@
-import { useUser, useAuth as useClerkAuth } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function useAuth() {
-  const { user: clerkUser, isLoaded } = useUser();
-  const { signOut } = useClerkAuth();
+  const [user, setUser] = useState<any>(null);
+  const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+  const router = useRouter();
 
-  const user = clerkUser ? {
-    id: clerkUser.id,
-    name: clerkUser.fullName || clerkUser.firstName || "User",
-    email: clerkUser.primaryEmailAddress?.emailAddress || "",
-    avatarUrl: clerkUser.imageUrl,
-  } : null;
+  const refreshUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        setStatus("authenticated");
+      } else {
+        setUser(null);
+        setStatus("unauthenticated");
+      }
+    } catch (e) {
+      setUser(null);
+      setStatus("unauthenticated");
+    }
+  };
+
+  useEffect(() => {
+    refreshUser();
+  }, []);
+
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setUser(null);
+    setStatus("unauthenticated");
+    router.push("/login");
+  };
 
   return {
     user,
-    status: isLoaded ? (user ? "authenticated" : "unauthenticated") : "loading",
-    login: async () => {}, // Handled by Clerk UI
-    register: async () => {}, // Handled by Clerk UI
-    logout: () => signOut(),
-    refreshUser: async () => {},
+    status,
+    login: async () => { router.push("/login") },
+    register: async () => { router.push("/register") },
+    logout,
+    refreshUser,
   };
 }

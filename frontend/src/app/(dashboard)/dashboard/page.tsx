@@ -9,7 +9,6 @@ import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardSummary } from "@/hooks/useDashboardSummary";
 import { formatMoney } from "@/lib/formatters/currency";
-import { AIInsightCard } from "@/components/ai/AIInsightCard";
 
 function greeting(): string {
   const hour = new Date().getHours();
@@ -32,7 +31,6 @@ export default function DashboardPage() {
         description="Here's what's happening with your expenses."
       />
 
-      <AIInsightCard analyticsData={summary} />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="You owe" value={summary.youOwe} formatValue={(v) => formatMoney(v)} tone="negative" icon={<HandCoins className="h-4 w-4" />} />

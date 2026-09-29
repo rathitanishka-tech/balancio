@@ -1,11 +1,11 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 import { getOrCreateCurrentUser } from "./user";
 
 export async function getUserGroups() {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
@@ -41,7 +41,7 @@ export async function getUserGroups() {
 }
 
 export async function createGroup(payload: { name: string; description?: string; currency?: string }) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
@@ -80,17 +80,37 @@ export async function createGroup(payload: { name: string; description?: string;
 
 
 export async function updateGroup(groupId: string, payload: { name?: string; description?: string }) {
+  const { userId } = await requireAuth();
+  if (!userId) throw new Error("Unauthorized");
+  const dbUser = await getOrCreateCurrentUser();
+  const membership = await prisma.groupMember.findFirst({ where: { groupId, userId: dbUser.id } });
+  if (!membership) throw new Error("Forbidden");
   return prisma.group.update({ where: { id: groupId }, data: payload });
 }
 export async function deleteGroup(groupId: string) {
+  const { userId } = await requireAuth();
+  if (!userId) throw new Error("Unauthorized");
+  const dbUser = await getOrCreateCurrentUser();
+  const membership = await prisma.groupMember.findFirst({ where: { groupId, userId: dbUser.id } });
+  if (!membership || membership.role !== "OWNER") throw new Error("Forbidden");
   return prisma.group.delete({ where: { id: groupId } });
 }
 export async function addGroupMember(groupId: string, email: string, role: string = "MEMBER") {
+  const { userId } = await requireAuth();
+  if (!userId) throw new Error("Unauthorized");
+  const dbUser = await getOrCreateCurrentUser();
+  const membership = await prisma.groupMember.findFirst({ where: { groupId, userId: dbUser.id } });
+  if (!membership) throw new Error("Forbidden");
   const user = await prisma.user.findFirst({ where: { email } });
   if (!user) throw new Error("User not found with this email");
   return prisma.groupMember.create({ data: { groupId, userId: user.id, role } });
 }
 export async function removeGroupMember(groupId: string, memberUserId: string) {
+  const { userId } = await requireAuth();
+  if (!userId) throw new Error("Unauthorized");
+  const dbUser = await getOrCreateCurrentUser();
+  const membership = await prisma.groupMember.findFirst({ where: { groupId, userId: dbUser.id } });
+  if (!membership) throw new Error("Forbidden");
   return prisma.groupMember.deleteMany({ where: { groupId, userId: memberUserId } });
 }
 

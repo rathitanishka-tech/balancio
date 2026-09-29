@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, LogOut } from "lucide-react";
 import { GlassNavbar } from "@/components/glass";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -36,6 +36,7 @@ function titleFor(pathname: string): string {
 
 export function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
   const pathname = usePathname() ?? "/dashboard";
+  const { logout, user } = useAuth();
 
   return (
     <GlassNavbar
@@ -63,8 +64,11 @@ export function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
           </Button>
           <ThemeToggle />
           <NotificationBell />
-          <div className="hidden sm:block">
-            <UserButton afterSignOutUrl="/" />
+          <div className="hidden sm:flex items-center gap-2">
+            {user && <span className="text-sm font-medium">{user.name}</span>}
+            <Button variant="ghost" size="icon" onClick={logout} title="Log out">
+              <LogOut className="h-[18px] w-[18px]" />
+            </Button>
           </div>
         </>
       }

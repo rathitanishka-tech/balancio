@@ -12,7 +12,7 @@ jest.mock("@/lib/api/notifications", () => ({
 }));
 
 const unreadNotification: Notification = {
-  _id: "n1",
+  id: "n1",
   userId: "u1",
   type: "EXPENSE_CREATED",
   title: "New expense added",

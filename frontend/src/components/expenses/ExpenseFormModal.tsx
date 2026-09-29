@@ -15,10 +15,6 @@ import { EXPENSE_CATEGORIES, type Expense, type ExpenseParticipant, type SplitTy
 import { ApiError, friendlyErrorMessage } from "@/lib/api/errors";
 import { minorToMajor } from "@/lib/formatters/currency";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AIExpenseAssistant } from "@/components/ai/AIExpenseAssistant";
-import { AIExpenseDraftCard } from "@/components/ai/AIExpenseDraftCard";
-import { ReceiptScanner } from "@/components/ai/ReceiptScanner";
-import { AIExpenseDraft } from "@/lib/api/ai";
 
 interface ScalarFields {
   title: string;
@@ -54,7 +50,6 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
   const [initializedForGroup, setInitializedForGroup] = React.useState<string | null>(null);
 
   const [activeTab, setActiveTab] = React.useState("manual");
-  const [aiDraft, setAiDraft] = React.useState<AIExpenseDraft | null>(null);
 
   const {
     register,
@@ -88,7 +83,7 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
     setInitializedForGroup(null);
     setParticipantsError(null);
     setActiveTab("manual");
-    setAiDraft(null);
+    setActiveTab("manual");
     reset({
       title: editingExpense?.expense.title ?? "",
       amount: editingExpense ? minorToMajor(editingExpense.expense.amount) : undefined,
@@ -191,33 +186,6 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
     }
   }
 
-  function handleDraftConfirm(draft: AIExpenseDraft) {
-    if (draft.title) setValue("title", draft.title);
-    if (draft.amountMinor) setValue("amount", minorToMajor(draft.amountMinor));
-    if (draft.date) setValue("date", draft.date.slice(0, 10));
-    
-    if (draft.category) {
-      const formattedCategory = draft.category.charAt(0) + draft.category.slice(1).toLowerCase();
-      if (EXPENSE_CATEGORIES.includes(formattedCategory as any)) {
-        setValue("category", formattedCategory);
-      }
-    }
-
-    if (draft.paidBy?.type === "CURRENT_USER" && user) {
-      setValue("paidBy", user.id);
-    } else if (draft.paidBy?.name && members) {
-      const member = members.find(m => m.name.toLowerCase().includes(draft.paidBy!.name!.toLowerCase()));
-      if (member) setValue("paidBy", member.userId);
-    }
-
-    if (draft.splitType) {
-       setSplitType(draft.splitType as SplitType);
-    }
-
-    setAiDraft(null);
-    setActiveTab("manual");
-    toast.success("AI draft applied! Review and click Save.");
-  }
 
   const groupLocked = Boolean(groupId) || isEditing;
 
@@ -231,14 +199,8 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
     >
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         {!isEditing && (
-          <TabsList className="mb-4 grid w-full grid-cols-3 bg-surface-1">
+          <TabsList className="mb-4 grid w-full grid-cols-1 bg-surface-1">
             <TabsTrigger value="manual">Manual</TabsTrigger>
-            <TabsTrigger value="ai" className="text-accent-violet data-[state=active]:text-accent-violet">
-              ✨ AI
-            </TabsTrigger>
-            <TabsTrigger value="receipt" className="text-accent-blue data-[state=active]:text-accent-blue">
-              📷 Receipt
-            </TabsTrigger>
           </TabsList>
         )}
         
@@ -327,43 +289,6 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
               </Button>
             </div>
           </form>
-        </TabsContent>
-        
-        <TabsContent value="ai">
-          {!selectedGroupId ? (
-             <div className="py-8 text-center text-ink-muted">
-               Please select a Group in the Manual tab first so I know who is involved!
-             </div>
-          ) : aiDraft ? (
-            <AIExpenseDraftCard 
-              draft={aiDraft} 
-              onConfirm={handleDraftConfirm} 
-              onCancel={() => setAiDraft(null)} 
-            />
-          ) : (
-            <AIExpenseAssistant 
-              onDraftGenerated={setAiDraft} 
-              groupMembers={members?.map(m => m.name)} 
-            />
-          )}
-        </TabsContent>
-        
-        <TabsContent value="receipt">
-          {!selectedGroupId ? (
-             <div className="py-8 text-center text-ink-muted">
-               Please select a Group in the Manual tab first so I know who is involved!
-             </div>
-          ) : aiDraft ? (
-            <AIExpenseDraftCard 
-              draft={aiDraft} 
-              onConfirm={handleDraftConfirm} 
-              onCancel={() => setAiDraft(null)} 
-            />
-          ) : (
-            <ReceiptScanner 
-              onDraftGenerated={setAiDraft} 
-            />
-          )}
         </TabsContent>
       </Tabs>
     </GlassModal>

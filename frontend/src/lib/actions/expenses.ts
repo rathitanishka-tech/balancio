@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 import { getOrCreateCurrentUser } from "./user";
 
@@ -15,7 +15,7 @@ export async function createExpense(payload: {
   splitType: "EQUAL" | "PERCENTAGE" | "CUSTOM" | "SHARES";
   participants: { userId: string; percentage?: number; shareAmount?: number }[];
 }) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
@@ -86,7 +86,7 @@ export async function createExpense(payload: {
 }
 
 export async function getExpenses(filters: { groupId?: string; limit?: number; page?: number } = {}) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
@@ -145,17 +145,24 @@ export async function getExpenses(filters: { groupId?: string; limit?: number; p
 
 
 export async function updateExpense(expenseId: string, payload: any) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
+  const dbUser = await getOrCreateCurrentUser();
+  const expense = await prisma.expense.findUnique({ where: { id: expenseId }, include: { splits: true } });
+  if (!expense) throw new Error("Not found");
+  if (expense.creatorId !== dbUser.id && !expense.splits.some(s => s.userId === dbUser.id)) throw new Error("Forbidden");
   return prisma.expense.update({ where: { id: expenseId }, data: { title: payload.title, amount: payload.amount, date: payload.date ? new Date(payload.date) : undefined } });
 }
 export async function deleteExpense(expenseId: string) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
+  const dbUser = await getOrCreateCurrentUser();
+  const expense = await prisma.expense.findUnique({ where: { id: expenseId } });
+  if (!expense || expense.creatorId !== dbUser.id) throw new Error("Forbidden");
   return prisma.expense.delete({ where: { id: expenseId } });
 }
 export async function getExpenseById(expenseId: string) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
   const expense = await prisma.expense.findUnique({ where: { id: expenseId }, include: { splits: true } });
   if (!expense) throw new Error("Not found");

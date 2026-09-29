@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 const mutateAsyncMock = jest.fn().mockResolvedValue({ _id: "s1" });
 
 jest.mock("@/hooks/useAuth", () => ({
-  useAuth: () => ({ user: { _id: "demo-tanu", name: "Tanu" } })
+  useAuth: () => ({ user: { id: "demo-tanu", name: "Tanu" } })
 }));
 
 jest.mock("@/hooks/useSettlements", () => ({

@@ -2,7 +2,6 @@ import { MemberAvatar } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/formatters/currency";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
-import { DebtExplanationDialog } from "@/components/ai/DebtExplanationDialog";
 
 export interface BalanceRowProps {
   name: string;
@@ -35,9 +34,6 @@ export function BalanceRow({ name, amount, currency = "INR", direction, explainD
           {formatMoney(amount, currency)}
         </span>
         
-        {explainData && (
-          <DebtExplanationDialog debtData={explainData} />
-        )}
 
         {direction === "owe" && onSettle && (
           <Button size="sm" variant="secondary" onClick={onSettle}>

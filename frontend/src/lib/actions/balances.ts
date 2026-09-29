@@ -1,12 +1,12 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 
 import { getOrCreateCurrentUser } from "./user";
 
 export async function getGroupBalances(groupId: string) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();

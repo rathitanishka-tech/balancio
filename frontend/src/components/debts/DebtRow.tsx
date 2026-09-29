@@ -1,7 +1,6 @@
 import { MemberAvatar } from "@/components/common";
 import { formatMoney } from "@/lib/formatters/currency";
 import { ArrowRight } from "lucide-react";
-import { DebtExplanationDialog } from "@/components/ai/DebtExplanationDialog";
 
 export interface DebtRowProps {
   fromName: string;
@@ -27,9 +26,6 @@ export function DebtRow({ fromName, toName, amount, currency = "INR", style, exp
       </div>
       <div className="flex items-center gap-2">
         <span className="shrink-0 text-sm font-semibold text-ink-primary">{formatMoney(amount, currency)}</span>
-        {explainData && (
-          <DebtExplanationDialog debtData={explainData} />
-        )}
       </div>
     </div>
   );

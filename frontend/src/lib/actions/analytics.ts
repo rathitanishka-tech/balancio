@@ -1,11 +1,11 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 import { getOrCreateCurrentUser } from "./user";
 
 export async function getAnalyticsOverview() {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
@@ -51,7 +51,7 @@ export async function getAnalyticsOverview() {
 }
 
 export async function getAnalyticsTrends(groupId?: string, months = 6) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();

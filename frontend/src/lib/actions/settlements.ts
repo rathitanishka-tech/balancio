@@ -1,12 +1,12 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 import { getOrCreateCurrentUser } from "./user";
 import type { CreateSettlementPayload, SettlementFilters } from "@/types/settlement";
 
 export async function createSettlement(payload: CreateSettlementPayload) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
@@ -40,7 +40,7 @@ export async function createSettlement(payload: CreateSettlementPayload) {
 }
 
 export async function getSettlements(filters: SettlementFilters = {}) {
-  const { userId } = auth();
+  const { userId } = await requireAuth();
   if (!userId) throw new Error("Unauthorized");
 
   const dbUser = await getOrCreateCurrentUser();
