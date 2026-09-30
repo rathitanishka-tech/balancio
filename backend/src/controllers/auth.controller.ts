@@ -34,8 +34,8 @@ export const authController = {
 
   async me(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      if (!req.user) throw new UnauthenticatedError();
-      const user = await userService.getById(req.user.id);
+      if (!(req as any).user) throw new UnauthenticatedError();
+      const user = await userService.getById((req as any).user.id);
       sendSuccess(res, { user });
     } catch (err) {
       next(err);
