@@ -23,8 +23,13 @@ import { invitationTokenRouter } from "./routes/invitation.routes";
 import aiRoutes from "./routes/ai.routes";
 
 // Ensure the upload directory exists before multer tries to write into it.
-if (!fs.existsSync(env.uploadDir)) {
-  fs.mkdirSync(env.uploadDir, { recursive: true });
+// On serverless environments (like Vercel), this may fail due to read-only filesystems.
+try {
+  if (!fs.existsSync(env.uploadDir)) {
+    fs.mkdirSync(env.uploadDir, { recursive: true });
+  }
+} catch (error) {
+  console.warn("Could not create upload directory. This is expected in read-only serverless environments.");
 }
 
 export function createApp(): Express {
