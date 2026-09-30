@@ -21,7 +21,9 @@ export function registerUnauthorizedHandler(fn: () => void): void {
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
-  const url = new URL(path.startsWith("http") ? path : `${API_URL}${path}`);
+  const fullPath = path.startsWith("http") ? path : `${API_URL}${path}`;
+  const base = typeof window !== "undefined" ? window.location.origin : "http://localhost";
+  const url = new URL(fullPath, base);
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null && value !== "") {
