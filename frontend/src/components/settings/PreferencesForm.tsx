@@ -29,7 +29,7 @@ export function PreferencesForm() {
     formState: { isSubmitting, isDirty }
   } = useForm<PreferencesValues>({
     resolver: zodResolver(preferencesSchema),
-    values: user ? { currency: user.currency as PreferencesValues["currency"], timezone: user.timezone } : undefined
+    values: user ? { currency: (user as any).currency as PreferencesValues["currency"], timezone: (user as any).timezone } : undefined
   });
 
   async function onSubmit(values: PreferencesValues) {
