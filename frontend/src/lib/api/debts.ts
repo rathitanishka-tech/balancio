@@ -9,6 +9,6 @@ export const debtsApi = {
 
   async getSimplifiedDebts(groupId: string): Promise<SimplifiedDebtsResult> {
     const data = await getSimplifiedDebts(groupId);
-    return data;
+    return data as unknown as SimplifiedDebtsResult;
   }
 };
