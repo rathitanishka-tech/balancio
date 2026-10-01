@@ -36,6 +36,6 @@ export const analyticsApi = {
 
   async trends(groupId?: string, months?: number): Promise<TrendPoint[]> {
     const data = await getAnalyticsTrends(groupId, months);
-    return data;
+    return data as unknown as TrendPoint[];
   }
 };
