@@ -11,7 +11,7 @@ import { HandCoins } from "lucide-react";
 function GroupedSettlements() {
   const { data, isLoading, isError, refetch } = useSettlements();
   const { data: groups } = useGroups();
-  const groupNameById = new Map((groups ?? []).map((g) => [g._id, g.name]));
+  const groupNameById = new Map((groups ?? []).map((g) => [g.id, g.name]));
 
   if (isLoading) return <LoadingSkeleton count={5} />;
   if (isError) return <ErrorState title="Couldn't load settlements" onRetry={() => refetch()} />;
@@ -39,7 +39,7 @@ function GroupedSettlements() {
           <GlassCard className="p-5">
             <div className="divide-y divide-line-subtle">
               {settlements.map((s) => (
-                <SettlementRowWithNames key={s._id} settlement={s} groupName={groupNameById.get(s.groupId)} />
+                <SettlementRowWithNames key={s.id} settlement={s} groupName={groupNameById.get(s.groupId)} />
               ))}
             </div>
           </GlassCard>
@@ -77,3 +77,4 @@ export default function SettlementsPage() {
     </div>
   );
 }
+

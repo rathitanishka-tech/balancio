@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/api/client";
+import { getAnalyticsOverview, getAnalyticsTrends } from "@/lib/actions/analytics";
 
 import type {
   AnalyticsOverview,
@@ -10,29 +11,31 @@ import type {
 
 export const analyticsApi = {
   async overview(): Promise<AnalyticsOverview> {
-    return apiRequest<AnalyticsOverview>("/analytics/overview");
+    const data = await getAnalyticsOverview();
+    return data;
   },
 
   async monthly(month: number, year: number, groupId?: string): Promise<MonthlyAnalytics> {
-    return apiRequest<MonthlyAnalytics>("/analytics/monthly", { query: { month, year, groupId } });
+    return {
+      month,
+      year,
+      totalSpending: 0,
+      userShare: 0,
+      totalPaid: 0,
+      totalOwed: 0,
+    };
   },
 
   async categories(groupId?: string): Promise<CategoryAnalytics[]> {
-    const { categories } = await apiRequest<{ categories: CategoryAnalytics[] }>("/analytics/categories", {
-      query: { groupId }
-    });
-    return categories;
+    return [];
   },
 
   async groups(): Promise<GroupAnalytics[]> {
-    const { groups } = await apiRequest<{ groups: GroupAnalytics[] }>("/analytics/groups");
-    return groups;
+    return [];
   },
 
   async trends(groupId?: string, months?: number): Promise<TrendPoint[]> {
-    const { trends } = await apiRequest<{ trends: TrendPoint[] }>("/analytics/trends", {
-      query: { groupId, months }
-    });
-    return trends;
+    const data = await getAnalyticsTrends(groupId, months);
+    return data;
   }
 };

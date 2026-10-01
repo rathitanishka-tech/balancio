@@ -18,20 +18,20 @@ import type { Group } from "@/types/group";
 export function GroupHeader({ group }: { group: Group }) {
   const router = useRouter();
   const { user } = useAuth();
-  const { data: members } = useGroupMembers(group._id);
-  const { data: balances } = useBalances(group._id);
+  const { data: members } = useGroupMembers(group.id);
+  const { data: balances } = useBalances(group.id);
   const deleteGroup = useDeleteGroup();
 
   const [editOpen, setEditOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
-  const myRole = members?.find((m) => m.userId === user?._id)?.role;
+  const myRole = members?.find((m) => m.userId === user?.id)?.role;
   const isOwner = myRole === "OWNER";
   const totalSpending = balances?.reduce((sum, b) => sum + b.totalPaid, 0) ?? 0;
 
   async function handleDelete() {
     try {
-      await deleteGroup.mutateAsync(group._id);
+      await deleteGroup.mutateAsync(group.id);
       toast.success("Group deleted");
       router.push("/groups");
     } catch (err) {
@@ -84,3 +84,4 @@ export function GroupHeader({ group }: { group: Group }) {
     </div>
   );
 }
+

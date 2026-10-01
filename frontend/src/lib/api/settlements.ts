@@ -1,4 +1,5 @@
-import { apiRequest, apiRequestPaginated } from "@/lib/api/client";
+import { apiRequest } from "@/lib/api/client";
+import { getSettlements, createSettlement } from "@/lib/actions/settlements";
 import type { CreateSettlementPayload, Settlement, SettlementFilters } from "@/types/settlement";
 import type { PaginationMeta } from "@/types/api";
 
@@ -9,21 +10,17 @@ export interface SettlementListResult {
 
 export const settlementsApi = {
   async list(filters: SettlementFilters = {}): Promise<SettlementListResult> {
-    const result = await apiRequestPaginated<Settlement>("/settlements", { query: { ...filters } });
-    return { items: result.data, pagination: result.pagination };
+    const data = await getSettlements(filters);
+    return data as SettlementListResult;
   },
 
   async get(settlementId: string): Promise<Settlement> {
-    const { settlement } = await apiRequest<{ settlement: Settlement }>(`/settlements/${settlementId}`);
-    return settlement;
+    throw new Error("Not implemented yet");
   },
 
   async create(payload: CreateSettlementPayload): Promise<Settlement> {
-    const { settlement } = await apiRequest<{ settlement: Settlement }>("/settlements", {
-      method: "POST",
-      body: payload
-    });
-    return settlement;
+    const data = await createSettlement(payload);
+    return data as Settlement;
   },
 
   async remove(settlementId: string): Promise<void> {

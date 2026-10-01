@@ -34,7 +34,7 @@ export default function ExpenseDetailPage({ params }: { params: { expenseId: str
   async function handleDelete() {
     if (!data) return;
     try {
-      await deleteExpense.mutateAsync(data.expense._id);
+      await deleteExpense.mutateAsync(data.expense.id);
       toast.success("Expense deleted");
       router.push(`/groups/${data.expense.groupId}/expenses`);
     } catch (err) {
@@ -58,7 +58,7 @@ export default function ExpenseDetailPage({ params }: { params: { expenseId: str
   }
 
   const { expense, participants } = data;
-  const isCreator = expense.createdBy === user?._id;
+  const isCreator = expense.createdBy === user?.id;
   const canEdit = isCreator; // Backend enforces the real rule (creator or group admin); this hides the button for the common case.
 
   return (

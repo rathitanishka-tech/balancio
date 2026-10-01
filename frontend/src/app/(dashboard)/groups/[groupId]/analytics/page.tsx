@@ -17,7 +17,7 @@ export default function GroupAnalyticsPage({ params }: { params: { groupId: stri
   const trends = useAnalyticsTrends(groupId);
   const { data: balances, isLoading: balancesLoading } = useBalances(groupId);
 
-  const mine = balances?.find((b) => b.userId === user?._id);
+  const mine = balances?.find((b) => b.userId === user?.id);
   const totalSpending = balances?.reduce((sum, b) => sum + b.totalPaid, 0) ?? 0;
 
   return (

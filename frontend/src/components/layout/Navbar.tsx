@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import { GlassNavbar } from "@/components/glass";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { UserMenu } from "@/components/layout/UserMenu";
+import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
 const TITLES: Record<string, string> = {
@@ -64,7 +64,7 @@ export function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
           <ThemeToggle />
           <NotificationBell />
           <div className="hidden sm:block">
-            <UserMenu collapsed />
+            <UserButton afterSignOutUrl="/" />
           </div>
         </>
       }

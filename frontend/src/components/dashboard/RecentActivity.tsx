@@ -16,7 +16,7 @@ export function RecentActivity() {
   const { data, isLoading, isError, refetch } = useExpenses({ limit: 6 });
   const { data: groups } = useGroups();
 
-  const groupNameById = new Map((groups ?? []).map((g) => [g._id, g.name]));
+  const groupNameById = new Map((groups ?? []).map((g) => [g.id, g.name]));
 
   return (
     <GlassCard className="p-5">
@@ -42,11 +42,11 @@ export function RecentActivity() {
       {!isLoading && !isError && data && data.items.length > 0 && (
         <div className="flex flex-col divide-y divide-line-subtle">
           {data.items.map((expense) => {
-            const isPayer = expense.paidBy === user?._id;
+            const isPayer = expense.paidBy === user?.id;
             return (
               <Link
-                key={expense._id}
-                href={`/expenses/${expense._id}`}
+                key={expense.id}
+                href={`/expenses/${expense.id}`}
                 className="focus-ring flex items-center justify-between gap-3 py-3 transition-colors hover:bg-surface-2/50 first:pt-0 last:pb-0 rounded-ctl px-2 -mx-2"
               >
                 <div className="min-w-0">
@@ -67,3 +67,4 @@ export function RecentActivity() {
     </GlassCard>
   );
 }
+

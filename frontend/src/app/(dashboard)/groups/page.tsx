@@ -67,7 +67,7 @@ export default function GroupsPage() {
       {!isLoading && !isError && filtered.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((group) => (
-            <GroupCard key={group._id} group={group} canManage={false} />
+            <GroupCard key={group.id} group={group} canManage={false} />
           ))}
         </div>
       )}
@@ -76,3 +76,4 @@ export default function GroupsPage() {
     </div>
   );
 }
+

@@ -37,7 +37,7 @@ export default function NotificationsPage() {
         <GlassCard className="p-3">
           <div className="flex flex-col divide-y divide-line-subtle">
             {data.items.map((n) => (
-              <NotificationItem key={n._id} notification={n} />
+              <NotificationItem key={n.id} notification={n} />
             ))}
           </div>
         </GlassCard>
@@ -45,3 +45,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

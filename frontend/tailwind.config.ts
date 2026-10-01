@@ -13,7 +13,7 @@ import path from "path";
 const config: Config = {
   darkMode: "class",
   content: [
-    path.join(__dirname, "src/**/*.{ts,tsx,mdx}").replace(/\\/g, "/")
+    "./src/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
     extend: {

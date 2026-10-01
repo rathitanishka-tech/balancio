@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import "@/styles/globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
-import { AuthProvider } from "@/providers/AuthProvider";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/providers/ThemeProvider";
@@ -24,20 +24,20 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
-      <body className="min-h-screen bg-bg-base font-sans text-ink-primary antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <QueryProvider>
-            <AuthProvider>
+    <ClerkProvider>
+      <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+        <body className="min-h-screen bg-bg-base font-sans text-ink-primary antialiased">
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <QueryProvider>
               <TooltipProvider delayDuration={200}>
                 {children}
                 <AIChatPanel />
                 <Toaster />
               </TooltipProvider>
-            </AuthProvider>
-          </QueryProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+            </QueryProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

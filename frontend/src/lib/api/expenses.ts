@@ -1,4 +1,4 @@
-import { apiRequest, apiRequestPaginated } from "@/lib/api/client";
+import { createExpense, getExpenses, updateExpense, deleteExpense, getExpenseById } from "@/lib/actions/expenses";
 import type {
   CreateExpensePayload,
   Expense,
@@ -15,29 +15,30 @@ export interface ExpenseListResult {
 
 export const expensesApi = {
   async list(filters: ExpenseFilters = {}): Promise<ExpenseListResult> {
-    const result = await apiRequestPaginated<Expense>("/expenses", {
-      query: { ...filters }
+    const data = await getExpenses({
+      groupId: filters.group,
+      limit: filters.limit,
+      page: filters.page,
     });
-    return { items: result.data, pagination: result.pagination };
+    return data as ExpenseListResult;
   },
 
   async get(expenseId: string): Promise<ExpenseWithParticipants> {
-    return apiRequest<ExpenseWithParticipants>(`/expenses/${expenseId}`);
+    const exp = await getExpenseById(expenseId);
+    return exp as unknown as ExpenseWithParticipants;
   },
 
   async create(payload: CreateExpensePayload): Promise<ExpenseWithParticipants> {
-    return apiRequest<ExpenseWithParticipants>("/expenses", { method: "POST", body: payload });
+    const expense = await createExpense(payload);
+    return expense as unknown as ExpenseWithParticipants;
   },
 
   async update(expenseId: string, payload: UpdateExpensePayload): Promise<Expense> {
-    const { expense } = await apiRequest<{ expense: Expense }>(`/expenses/${expenseId}`, {
-      method: "PATCH",
-      body: payload
-    });
-    return expense;
+    const expense = await updateExpense(expenseId, payload);
+    return expense as unknown as Expense;
   },
 
   async remove(expenseId: string): Promise<void> {
-    await apiRequest<void>(`/expenses/${expenseId}`, { method: "DELETE" });
+    await deleteExpense(expenseId);
   }
 };

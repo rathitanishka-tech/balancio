@@ -1,7 +1,7 @@
 export type PaymentMethod = "CASH" | "UPI" | "BANK_TRANSFER" | "OTHER";
 
 export interface Settlement {
-  _id: string;
+  id: string;
   groupId: string;
   fromUser: string;
   toUser: string;
@@ -37,3 +37,4 @@ export const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
   { value: "BANK_TRANSFER", label: "Bank Transfer" },
   { value: "OTHER", label: "Other" }
 ];
+

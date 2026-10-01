@@ -5,18 +5,33 @@ import { MessageSquare, X, Send, Bot, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { aiApi } from "@/lib/api/ai";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
+import { useChat } from "@ai-sdk/react";
+import { toast } from "sonner";
 
 export function AIChatPanel() {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  const { messages, status, sendMessage } = useChat({
+    onError: (err) => {
+      console.error("Chat error:", err);
+      toast.error(err.message || "Failed to get AI response. Please try again.");
+    }
+  });
+
+  const isLoading = status === "streaming" || status === "submitted";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage({ text: input });
+    setInput("");
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,44 +40,6 @@ export function AIChatPanel() {
   React.useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
-
-  async function handleSend(e: React.FormEvent) {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: Message = { id: Date.now().toString(), role: "user", content: input.trim() };
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const history = messages.map(m => ({ role: m.role, content: m.content }));
-      const response = await aiApi.askExpenses(userMessage.content, history);
-      // apiRequest already unwraps { success, data } and returns the data directly.
-      if (response && (response as any).message) {
-        const assistantMessage: Message = { id: (Date.now() + 1).toString(), role: "assistant", content: (response as any).message };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        throw new Error("Unknown error");
-      }
-    } catch (error: any) {
-      console.error("AI chat error:", error);
-      
-      let content = "Something went wrong while processing that. Please try again.";
-      
-      // If it's our custom ApiError, use its message directly, or use friendlyErrorMessage
-      if (error?.status === 429) {
-        content = "The AI provider is temporarily rate-limited right now. Please try again in a moment.";
-      } else if (error?.message) {
-        content = error.message;
-      }
-      
-      const errorMessage: Message = { id: (Date.now() + 1).toString(), role: "assistant", content };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   return (
     <>
@@ -106,7 +83,7 @@ export function AIChatPanel() {
                 <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
                   msg.role === "user" ? "bg-surface-3 text-ink-primary rounded-tr-sm" : "bg-accent-violet/10 text-ink-primary rounded-tl-sm whitespace-pre-wrap"
                 }`}>
-                  {msg.content}
+                  {(msg.parts ? msg.parts.map(p => p.type === 'text' ? p.text : '').join('') : (msg as any).content) || "..."}
                 </div>
               </div>
             ))}
@@ -130,15 +107,14 @@ export function AIChatPanel() {
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSend} className="border-t border-line-subtle p-3 bg-surface-1">
+          <form onSubmit={handleSubmit} className="border-t border-line-subtle p-3 bg-surface-1">
             <div className="relative flex items-center">
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={handleInputChange}
                 placeholder="Ask about your expenses..."
                 className="w-full rounded-full border border-line-subtle bg-surface-2 py-2.5 pl-4 pr-12 text-sm text-ink-primary placeholder:text-ink-muted focus:border-accent-violet focus:outline-none focus:ring-1 focus:ring-accent-violet transition-colors"
-                disabled={isLoading}
               />
               <button
                 type="submit"

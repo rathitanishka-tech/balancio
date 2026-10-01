@@ -27,11 +27,11 @@ export function SettlementRow({
   const deleteSettlement = useDeleteSettlement(settlement.groupId);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
-  const canDelete = settlement.createdBy === user?._id;
+  const canDelete = settlement.createdBy === user?.id;
 
   async function handleDelete() {
     try {
-      await deleteSettlement.mutateAsync(settlement._id);
+      await deleteSettlement.mutateAsync(settlement.id);
       toast.success("Settlement deleted");
       setConfirmOpen(false);
     } catch (err) {
@@ -77,3 +77,4 @@ export function SettlementRow({
     </div>
   );
 }
+

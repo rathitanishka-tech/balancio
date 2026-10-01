@@ -61,7 +61,7 @@ export function SettleUpModal({
     try {
       await createSettlement.mutateAsync({
         groupId,
-        fromUser: user._id,
+        fromUser: user.id,
         toUser: toUserId,
         amount: Math.round(values.amount * 100),
         paymentMethod: values.paymentMethod,
@@ -117,3 +117,4 @@ export function SettleUpModal({
     </GlassModal>
   );
 }
+

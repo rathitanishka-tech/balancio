@@ -2,7 +2,7 @@ export type SplitType = "EQUAL" | "PERCENTAGE" | "CUSTOM";
 
 /** All amounts are integers in minor currency units (e.g. paise), exactly as the backend stores/returns them. */
 export interface Expense {
-  _id: string;
+  id: string;
   groupId: string;
   title: string;
   description?: string;
@@ -74,3 +74,4 @@ export const EXPENSE_CATEGORIES = [
   "Healthcare",
   "Other"
 ] as const;
+

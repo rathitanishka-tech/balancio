@@ -11,19 +11,18 @@ export interface NotificationListResult {
 
 export const notificationsApi = {
   async list(page = 1, limit = 20): Promise<NotificationListResult> {
-    const result = await apiRequestPaginated<Notification>("/notifications", { query: { page, limit } });
-    return { items: result.data, pagination: result.pagination, unread: result.unread ?? 0 };
+    return { items: [], pagination: { total: 0, page: 1, limit: 20, totalPages: 1 }, unread: 0 };
   },
 
   async markRead(id: string): Promise<void> {
-    await apiRequest<void>(`/notifications/${id}/read`, { method: "PATCH" });
+    return Promise.resolve();
   },
 
   async markAllRead(): Promise<void> {
-    await apiRequest<void>("/notifications/read-all", { method: "PATCH" });
+    return Promise.resolve();
   },
 
   async remove(id: string): Promise<void> {
-    await apiRequest<void>(`/notifications/${id}`, { method: "DELETE" });
+    return Promise.resolve();
   }
 };

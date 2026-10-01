@@ -1,5 +1,4 @@
-import { apiRequest } from "./client";
-// Redefining types for clean separation from backend
+import { parseExpenseAction, parseReceiptAction, getInsightsAction, explainDebtAction } from "../actions/ai-actions";
 
 export interface AIExpenseDraft {
   intent: "CREATE_EXPENSE" | "ASK_QUESTION" | "UNKNOWN";
@@ -29,39 +28,25 @@ export interface AIReceiptExtraction {
 
 export const aiApi = {
   parseExpense: async (text: string, groupMembers?: string[]): Promise<AIExpenseDraft> => {
-    return apiRequest("/ai/parse-expense", { method: "POST", body: { text, groupMembers } });
+    return parseExpenseAction(text, groupMembers) as Promise<AIExpenseDraft>;
   },
   
   parseReceipt: async (file: File): Promise<AIReceiptExtraction> => {
-    // Note: apiRequest sets Content-Type: application/json if body is defined.
-    // Since FormData requires multipart/form-data boundary, we'll use native fetch here
-    // or modify apiRequest. For simplicity, we just use native fetch with token.
-    const { getToken, clearToken } = await import("@/lib/auth/token");
     const formData = new FormData();
     formData.append("receipt", file);
-    
-    const headers: Record<string, string> = {};
-    const token = getToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
-
-    const res = await fetch("/api/ai/parse-receipt", {
-      method: "POST",
-      headers,
-      body: formData
-    });
-    if (!res.ok) throw new Error("Failed to parse receipt");
-    return res.json();
+    return parseReceiptAction(formData) as Promise<AIReceiptExtraction>;
   },
 
   getInsights: async (analyticsData: any): Promise<{ summary: string }> => {
-    return apiRequest("/ai/insights", { method: "POST", body: { analyticsData } });
+    return getInsightsAction(analyticsData);
   },
 
   explainDebt: async (debtData: any): Promise<{ explanation: string }> => {
-    return apiRequest("/ai/explain-debt", { method: "POST", body: { debtData } });
+    return explainDebtAction(debtData);
   },
 
   askExpenses: async (query: string, history?: { role: string, content: string }[]): Promise<{ message: string, intent: string }> => {
-    return apiRequest("/ai/ask", { method: "POST", body: { query, history } });
+    // Moved to Vercel AI SDK useChat in AIChatPanel
+    throw new Error("askExpenses is deprecated. Use useChat hook.");
   }
 };

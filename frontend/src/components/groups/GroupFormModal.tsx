@@ -25,7 +25,7 @@ export function GroupFormModal({ open, onOpenChange, group }: GroupFormModalProp
   const router = useRouter();
   const isEditing = Boolean(group);
   const createGroup = useCreateGroup();
-  const updateGroup = useUpdateGroup(group?._id ?? "");
+  const updateGroup = useUpdateGroup(group?.id ?? "");
 
   const {
     register,
@@ -53,7 +53,7 @@ export function GroupFormModal({ open, onOpenChange, group }: GroupFormModalProp
       } else {
         const created = await createGroup.mutateAsync(values);
         toast.success("Group created");
-        router.push(`/groups/${created._id}`);
+        router.push(`/groups/${created.id}`);
       }
       onOpenChange(false);
     } catch (err) {
@@ -95,3 +95,4 @@ export function GroupFormModal({ open, onOpenChange, group }: GroupFormModalProp
     </GlassModal>
   );
 }
+

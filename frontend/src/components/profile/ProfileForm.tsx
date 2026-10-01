@@ -28,7 +28,7 @@ export function ProfileForm() {
     formState: { errors, isSubmitting, isDirty }
   } = useForm<BasicProfileValues>({
     resolver: zodResolver(basicProfileSchema),
-    values: user ? { name: user.name, avatar: user.avatar ?? "" } : undefined
+    values: user ? { name: user.name, avatar: user.avatarUrl ?? "" } : undefined
   });
 
   async function onSubmit(values: BasicProfileValues) {
@@ -47,7 +47,7 @@ export function ProfileForm() {
   return (
     <GlassCard className="p-6">
       <div className="mb-6 flex items-center gap-4">
-        <MemberAvatar name={user.name} avatar={watch("avatar") || user.avatar} size="lg" />
+        <MemberAvatar name={user.name} avatar={watch("avatar") || user.avatarUrl} size="lg" />
         <div>
           <p className="text-sm font-medium text-ink-primary">{user.name}</p>
           <p className="text-xs text-ink-muted">{user.email}</p>

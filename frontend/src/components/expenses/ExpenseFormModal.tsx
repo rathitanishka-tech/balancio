@@ -69,16 +69,16 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
       amount: editingExpense ? minorToMajor(editingExpense.expense.amount) : undefined,
       date: editingExpense?.expense.date.slice(0, 10) ?? today(),
       category: editingExpense?.expense.category ?? "General",
-      paidBy: editingExpense?.expense.paidBy ?? user?._id ?? "",
+      paidBy: editingExpense?.expense.paidBy ?? user?.id ?? "",
       notes: editingExpense?.expense.description ?? ""
     }
   });
 
   const amount = watch("amount");
-  const currency = groups?.find((g) => g._id === selectedGroupId)?.currency ?? "INR";
+  const currency = groups?.find((g) => g.id === selectedGroupId)?.currency ?? "INR";
 
   const createExpense = useCreateExpense();
-  const updateExpense = useUpdateExpense(editingExpense?.expense._id ?? "", selectedGroupId);
+  const updateExpense = useUpdateExpense(editingExpense?.expense.id ?? "", selectedGroupId);
   const isSubmitting = createExpense.isPending || updateExpense.isPending;
 
   React.useEffect(() => {
@@ -94,10 +94,19 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
       amount: editingExpense ? minorToMajor(editingExpense.expense.amount) : undefined,
       date: editingExpense?.expense.date.slice(0, 10) ?? today(),
       category: editingExpense?.expense.category ?? "General",
-      paidBy: editingExpense?.expense.paidBy ?? user?._id ?? "",
+      paidBy: editingExpense?.expense.paidBy ?? "",
       notes: editingExpense?.expense.description ?? ""
     });
-  }, [open, groupId, editingExpense]);
+  }, [open, groupId, editingExpense, reset]);
+
+  React.useEffect(() => {
+    if (members && user?.email && !watch("paidBy") && !editingExpense) {
+      const me = members.find((m) => m.email === user.email);
+      if (me) {
+        setValue("paidBy", me.userId);
+      }
+    }
+  }, [members, user?.email, editingExpense, setValue, watch]);
 
   React.useEffect(() => {
     if (!members || !selectedGroupId || initializedForGroup === selectedGroupId) return;
@@ -195,7 +204,7 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
     }
 
     if (draft.paidBy?.type === "CURRENT_USER" && user) {
-      setValue("paidBy", user._id);
+      setValue("paidBy", user.id);
     } else if (draft.paidBy?.name && members) {
       const member = members.find(m => m.name.toLowerCase().includes(draft.paidBy!.name!.toLowerCase()));
       if (member) setValue("paidBy", member.userId);
@@ -266,7 +275,7 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
                   placeholder="Choose a group"
                   value={selectedGroupId}
                   onValueChange={setSelectedGroupId}
-                  options={(groups ?? []).map((g) => ({ value: g._id, label: g.name }))}
+                  options={(groups ?? []).map((g) => ({ value: g.id, label: g.name }))}
                 />
               )}
               <GlassSelect
@@ -360,3 +369,4 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
     </GlassModal>
   );
 }
+

@@ -16,7 +16,7 @@ export default function GroupMembersPage({ params }: { params: { groupId: string
   const { data: members, isLoading, isError, refetch } = useGroupMembers(groupId);
   const [addOpen, setAddOpen] = React.useState(false);
 
-  const myRole = members?.find((m) => m.userId === user?._id)?.role;
+  const myRole = members?.find((m) => m.userId === user?.id)?.role;
   const canManage = myRole === "OWNER" || myRole === "ADMIN";
 
   return (

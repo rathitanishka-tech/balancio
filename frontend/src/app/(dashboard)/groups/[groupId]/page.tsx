@@ -27,7 +27,7 @@ export default function GroupOverviewPage({ params }: { params: { groupId: strin
   const [addExpenseOpen, setAddExpenseOpen] = React.useState(false);
   const [addMemberOpen, setAddMemberOpen] = React.useState(false);
 
-  const mine = balances?.find((b) => b.userId === user?._id);
+  const mine = balances?.find((b) => b.userId === user?.id);
   const currency = "INR";
 
   return (
@@ -121,8 +121,8 @@ export default function GroupOverviewPage({ params }: { params: { groupId: strin
           <div className="flex flex-col divide-y divide-line-subtle">
             {expensesResult.items.map((e) => (
               <Link
-                key={e._id}
-                href={`/expenses/${e._id}`}
+                key={e.id}
+                href={`/expenses/${e.id}`}
                 className="focus-ring -mx-2 flex items-center justify-between gap-3 rounded-ctl px-2 py-3 transition-colors hover:bg-surface-2/50 first:pt-0 last:pb-0"
               >
                 <div className="min-w-0">

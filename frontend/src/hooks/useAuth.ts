@@ -1,6 +1,22 @@
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useUser, useAuth as useClerkAuth } from "@clerk/nextjs";
 
-/** Thin re-export so components import from hooks/, consistent with the rest of the app. */
 export function useAuth() {
-  return useAuthContext();
+  const { user: clerkUser, isLoaded } = useUser();
+  const { signOut } = useClerkAuth();
+
+  const user = clerkUser ? {
+    id: clerkUser.id,
+    name: clerkUser.fullName || clerkUser.firstName || "User",
+    email: clerkUser.primaryEmailAddress?.emailAddress || "",
+    avatarUrl: clerkUser.imageUrl,
+  } : null;
+
+  return {
+    user,
+    status: isLoaded ? (user ? "authenticated" : "unauthenticated") : "loading",
+    login: async () => {}, // Handled by Clerk UI
+    register: async () => {}, // Handled by Clerk UI
+    logout: () => signOut(),
+    refreshUser: async () => {},
+  };
 }

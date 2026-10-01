@@ -6,7 +6,7 @@ export interface NotificationPreferences {
 }
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   avatar?: string;
@@ -16,3 +16,4 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+

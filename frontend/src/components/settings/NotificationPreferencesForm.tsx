@@ -19,7 +19,7 @@ export function NotificationPreferencesForm() {
   const { user, refreshUser } = useAuth();
   const [pending, setPending] = React.useState<string | null>(null);
 
-  const prefs: NotificationPreferences = user?.notificationPreferences ?? {
+  const prefs: NotificationPreferences = (user as any)?.notificationPreferences ?? {
     email: true,
     push: true,
     expenseCreated: true,

@@ -17,11 +17,11 @@ export function NotificationItem({ notification }: { notification: Notification 
         "group flex items-start gap-3 rounded-ctl px-3 py-3 transition-colors",
         !notification.read && "bg-accent-violet/[0.04]"
       )}
-      onClick={() => !notification.read && markRead.mutate(notification._id)}
+      onClick={() => !notification.read && markRead.mutate(notification.id)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === "Enter" && !notification.read) markRead.mutate(notification._id);
+        if (e.key === "Enter" && !notification.read) markRead.mutate(notification.id);
       }}
     >
       <span
@@ -42,7 +42,7 @@ export function NotificationItem({ notification }: { notification: Notification 
         className="h-7 w-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
         onClick={(e) => {
           e.stopPropagation();
-          remove.mutate(notification._id);
+          remove.mutate(notification.id);
         }}
         aria-label="Delete notification"
       >
@@ -51,3 +51,4 @@ export function NotificationItem({ notification }: { notification: Notification 
     </div>
   );
 }
+

@@ -39,8 +39,8 @@ export function BalanceOverview({ groupId }: { groupId: string }) {
     );
   }
 
-  const youOweRows = (debts ?? []).filter((d) => d.from === user?._id);
-  const youAreOwedRows = (debts ?? []).filter((d) => d.to === user?._id);
+  const youOweRows = (debts ?? []).filter((d) => d.from === user?.id);
+  const youAreOwedRows = (debts ?? []).filter((d) => d.to === user?.id);
 
   const totalYouOwe = youOweRows.reduce((sum, d) => sum + d.amount, 0);
   const totalYouAreOwed = youAreOwedRows.reduce((sum, d) => sum + d.amount, 0);
@@ -65,7 +65,7 @@ export function BalanceOverview({ groupId }: { groupId: string }) {
                 amount={d.amount}
                 currency={currency}
                 direction="owe"
-                explainData={{ groupId, from: user?._id, to: d.to, amount: d.amount, name: nameByUserId.get(d.to) }}
+                explainData={{ groupId, from: user?.id, to: d.to, amount: d.amount, name: nameByUserId.get(d.to) }}
                 onSettle={() => setSettleTarget({ userId: d.to, name: nameByUserId.get(d.to) ?? "Member", amount: d.amount })}
               />
             ))}
@@ -86,7 +86,7 @@ export function BalanceOverview({ groupId }: { groupId: string }) {
                 amount={d.amount} 
                 currency={currency} 
                 direction="owed" 
-                explainData={{ groupId, from: d.from, to: user?._id, amount: d.amount, name: nameByUserId.get(d.from) }}
+                explainData={{ groupId, from: d.from, to: user?.id, amount: d.amount, name: nameByUserId.get(d.from) }}
               />
             ))}
           </div>
@@ -107,3 +107,4 @@ export function BalanceOverview({ groupId }: { groupId: string }) {
     </div>
   );
 }
+

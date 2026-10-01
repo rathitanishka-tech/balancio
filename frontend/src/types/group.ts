@@ -1,7 +1,7 @@
 export type GroupRole = "OWNER" | "ADMIN" | "MEMBER";
 
 export interface Group {
-  _id: string;
+  id: string;
   name: string;
   description?: string;
   image?: string;
@@ -43,10 +43,11 @@ export type ActivityType =
   | "group_updated";
 
 export interface Activity {
-  _id: string;
+  id: string;
   groupId: string;
   actorId: string;
   type: ActivityType;
   metadata?: Record<string, unknown>;
   createdAt: string;
 }
+

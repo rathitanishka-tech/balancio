@@ -35,7 +35,7 @@ export function ExpenseFilters() {
         placeholder="All groups"
         value={group}
         onValueChange={(v) => updateParam("group", v)}
-        options={(groups ?? []).map((g) => ({ value: g._id, label: g.name }))}
+        options={(groups ?? []).map((g) => ({ value: g.id, label: g.name }))}
       />
       <GlassSelect
         containerClassName="w-40"
@@ -71,3 +71,4 @@ export function ExpenseFilters() {
     </div>
   );
 }
+

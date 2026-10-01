@@ -15,7 +15,7 @@ export function ExpenseList({ filters, onAddExpense }: { filters: ExpenseFilters
   const { user } = useAuth();
   const { data, isLoading, isError, refetch } = useExpenses(filters);
   const { data: groups } = useGroups();
-  const groupNameById = new Map((groups ?? []).map((g) => [g._id, g.name]));
+  const groupNameById = new Map((groups ?? []).map((g) => [g.id, g.name]));
 
   if (isLoading) return <LoadingSkeleton count={6} />;
   if (isError) return <ErrorState title="Couldn't load expenses" onRetry={() => refetch()} />;
@@ -52,16 +52,16 @@ export function ExpenseList({ filters, onAddExpense }: { filters: ExpenseFilters
           </thead>
           <tbody>
             {data.items.map((e) => (
-              <tr key={e._id} className="border-b border-line-subtle last:border-0 hover:bg-surface-2/40">
+              <tr key={e.id} className="border-b border-line-subtle last:border-0 hover:bg-surface-2/40">
                 <td className="px-5 py-3 text-ink-secondary">{formatDateShort(e.date)}</td>
                 <td className="px-5 py-3">
-                  <Link href={`/expenses/${e._id}`} className="font-medium text-ink-primary hover:text-accent-violet">
+                  <Link href={`/expenses/${e.id}`} className="font-medium text-ink-primary hover:text-accent-violet">
                     {e.title}
                   </Link>
                   <p className="text-xs text-ink-muted">{e.category}</p>
                 </td>
                 <td className="px-5 py-3 text-ink-secondary">{groupNameById.get(e.groupId) ?? "—"}</td>
-                <td className="px-5 py-3 text-ink-secondary">{e.paidBy === user?._id ? "You" : "Member"}</td>
+                <td className="px-5 py-3 text-ink-secondary">{e.paidBy === user?.id ? "You" : "Member"}</td>
                 <td className="px-5 py-3 text-right font-medium text-ink-primary">{formatMoney(e.amount, e.currency)}</td>
               </tr>
             ))}
@@ -72,7 +72,7 @@ export function ExpenseList({ filters, onAddExpense }: { filters: ExpenseFilters
       {/* Mobile cards */}
       <div className="flex flex-col gap-3 sm:hidden">
         {data.items.map((e) => (
-          <Link key={e._id} href={`/expenses/${e._id}`}>
+          <Link key={e.id} href={`/expenses/${e.id}`}>
             <GlassCard interactive className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -90,3 +90,4 @@ export function ExpenseList({ filters, onAddExpense }: { filters: ExpenseFilters
     </>
   );
 }
+

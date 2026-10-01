@@ -10,7 +10,7 @@ export type NotificationType =
   | "SETTLEMENT_RECEIVED";
 
 export interface Notification {
-  _id: string;
+  id: string;
   userId: string;
   type: NotificationType;
   title: string;
@@ -21,3 +21,4 @@ export interface Notification {
   read: boolean;
   createdAt: string;
 }
+

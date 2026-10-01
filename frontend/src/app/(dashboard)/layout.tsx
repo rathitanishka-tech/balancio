@@ -1,5 +1,7 @@
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { getOrCreateCurrentUser } from "@/lib/actions/user";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  await getOrCreateCurrentUser();
   return <DashboardShell>{children}</DashboardShell>;
 }

@@ -24,7 +24,7 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
       align="start"
       trigger={
         <button className="focus-ring flex w-full items-center gap-2.5 rounded-ctl p-2 text-left transition-colors hover:bg-surface-2">
-          <MemberAvatar name={user.name} avatar={user.avatar} size="sm" />
+          <MemberAvatar name={user.name} avatar={user.avatarUrl} size="sm" />
           {!collapsed && (
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-medium text-ink-primary">{user.name}</span>
