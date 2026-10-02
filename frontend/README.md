@@ -164,4 +164,4 @@ Both are clean: `next build` type-checks the whole project, runs ESLint, and sta
 - A real password-reset endpoint (the forgot-password page's UI and validation are complete, but honestly disabled - see the comment in `app/(auth)/forgot-password/page.tsx` - since the backend doesn't expose this yet)
 - Receipt upload/preview in the expense form (the backend's attachment endpoints exist; the form doesn't yet have a file picker wired to them)
 - Optimistic updates for settlement creation and notification read-state, rather than waiting for the round trip
-- E2E tests (Playwright/Cypress) covering the full create-group → add-expense → settle flow against a live backend
+- E2E tests (Playwright/Cypress) covering the full create-group → add-expense → settle flow against a live backend.
