@@ -16,15 +16,23 @@ export interface DashboardSummary {
 
 export function useDashboardSummary(): DashboardSummary {
   const { user } = useAuth();
-  const groupsQuery = useQuery({ queryKey: queryKeys.groups(), queryFn: () => getUserGroups() });
-  const overviewQuery = useQuery({ queryKey: queryKeys.analyticsOverview(), queryFn: () => getDashboardOverview() });
+  const groupsQuery = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => getUserGroups(),
+    enabled: Boolean(user?.id)
+  });
+  const overviewQuery = useQuery({
+    queryKey: queryKeys.analyticsOverview(),
+    queryFn: () => getDashboardOverview(),
+    enabled: Boolean(user?.id)
+  });
 
   const groups = groupsQuery.data ?? [];
   const balanceQueries = useQueries({
     queries: groups.map((g) => ({
       queryKey: queryKeys.balances(g.id),
       queryFn: () => getGroupBalances(g.id),
-      enabled: groupsQuery.isSuccess
+      enabled: Boolean(user?.id) && groupsQuery.isSuccess
     }))
   });
 

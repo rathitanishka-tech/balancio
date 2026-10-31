@@ -1,19 +1,14 @@
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { prisma } from "../db";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-for-dev-only";
+import { getSyncedUser } from "./sync";
 
 export async function getSession() {
-  const token = cookies().get("auth-token")?.value;
-  if (!token) return null;
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    return { userId: decoded.userId };
-  } catch (err) {
-    return null;
+  const syncedUser = await getSyncedUser();
+  if (syncedUser) {
+    return { userId: syncedUser.id, clerkAuth: true };
   }
+
+  return null;
 }
 
 export async function getCurrentUser() {

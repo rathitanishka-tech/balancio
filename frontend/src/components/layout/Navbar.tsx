@@ -2,12 +2,13 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { Search, LogOut } from "lucide-react";
+import { Search, LogOut, Bot } from "lucide-react";
 import { GlassNavbar } from "@/components/glass";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { UserButton } from "@clerk/nextjs";
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -34,7 +35,7 @@ function titleFor(pathname: string): string {
   return last.charAt(0).toUpperCase() + last.slice(1);
 }
 
-export function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
+export function Navbar({ onOpenSearch, onOpenAi }: { onOpenSearch: () => void; onOpenAi?: () => void }) {
   const pathname = usePathname() ?? "/dashboard";
   const { logout, user } = useAuth();
 
@@ -47,6 +48,19 @@ export function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
       }
       right={
         <>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onOpenAi}
+            className="hidden items-center gap-2 text-accent-violet sm:flex mr-2"
+          >
+            <Bot className="h-4 w-4" />
+            Ask AI
+          </Button>
+          <Button variant="ghost" size="icon" className="sm:hidden text-accent-violet" onClick={onOpenAi} aria-label="Ask AI">
+            <Bot className="h-[18px] w-[18px]" />
+          </Button>
+
           <Button
             variant="secondary"
             size="sm"
@@ -66,7 +80,8 @@ export function Navbar({ onOpenSearch }: { onOpenSearch: () => void }) {
           <NotificationBell />
           <div className="hidden sm:flex items-center gap-2">
             {user && <span className="text-sm font-medium">{user.name}</span>}
-            <Button variant="ghost" size="icon" onClick={logout} title="Log out">
+            <UserButton afterSignOutUrl="/login" />
+            <Button variant="ghost" size="icon" onClick={logout} title="Log out (Native)">
               <LogOut className="h-[18px] w-[18px]" />
             </Button>
           </div>

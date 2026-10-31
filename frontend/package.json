@@ -13,6 +13,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.1.4",
     "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -35,6 +36,7 @@
     "express-rate-limit": "^8.7.0",
     "framer-motion": "^13.4.4",
     "geist": "^1.7.2",
+    "groq-sdk": "^1.6.0",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.400.0",

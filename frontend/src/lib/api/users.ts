@@ -1,4 +1,4 @@
-import { apiRequest } from "@/lib/api/client";
+import { getOrCreateCurrentUser, updateUserProfile } from "@/lib/actions/user";
 import type { User } from "@/types/user";
 
 export interface UpdateProfilePayload {
@@ -11,24 +11,24 @@ export interface UpdateProfilePayload {
 
 export const usersApi = {
   async getMe(): Promise<User> {
-    const { user } = await apiRequest<{ user: User }>("/users/me");
-    return user;
+    const user = await getOrCreateCurrentUser();
+    return user as unknown as User;
   },
 
   async updateMe(payload: UpdateProfilePayload): Promise<User> {
-    const { user } = await apiRequest<{ user: User }>("/users/me", { method: "PATCH", body: payload });
-    return user;
-  },
-
-  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
-    await apiRequest<void>("/users/me/change-password", {
-      method: "POST",
-      body: { currentPassword, newPassword }
+    const user = await updateUserProfile({
+      name: payload.name,
+      avatar: payload.avatar,
     });
+    return user as unknown as User;
   },
 
-  async search(query: string): Promise<User[]> {
-    const { users } = await apiRequest<{ users: User[] }>("/users/search", { query: { q: query } });
-    return users;
+  async changePassword(_currentPassword: string, _newPassword: string): Promise<void> {
+    // In Clerk-managed auth, password changes and MFA are handled via Clerk UserButton / Account Portal.
+    return Promise.resolve();
+  },
+
+  async search(_query: string): Promise<User[]> {
+    return [];
   }
 };

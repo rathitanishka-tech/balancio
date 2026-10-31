@@ -1,111 +1,144 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth/session";
+import { getSession, requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 import { getOrCreateCurrentUser } from "./user";
 
+const EMPTY_OVERVIEW = {
+  groupCount: 0,
+  expenseCount: 0,
+  totalSpending: 0,
+  userShare: 0,
+  totalPaid: 0,
+  totalOwed: 0,
+  netBalance: 0,
+};
+
 export async function getAnalyticsOverview() {
-  const { userId } = await requireAuth();
-  if (!userId) throw new Error("Unauthorized");
+  const session = await getSession();
+  if (!session?.userId) return EMPTY_OVERVIEW;
 
   const dbUser = await getOrCreateCurrentUser();
+  if (!dbUser) return EMPTY_OVERVIEW;
 
-  const memberships = await prisma.groupMember.count({ where: { userId: dbUser.id } });
-  
-  const userSplits = await prisma.split.findMany({
-    where: { userId: dbUser.id },
-    include: { expense: true },
-  });
+  try {
+    const memberships = await prisma.groupMember.count({ where: { userId: dbUser.id } });
+    
+    const userExpenses = await prisma.expense.findMany({
+      where: {
+        OR: [
+          { creatorId: dbUser.id },
+          { splits: { some: { userId: dbUser.id } } },
+        ],
+      },
+      include: { splits: true },
+    });
 
-  const expenseCount = new Set(userSplits.map(s => s.expenseId)).size;
-  
-  let totalSpending = 0;
-  let userShare = 0;
-  let totalPaid = 0;
-  let totalOwed = 0; // The amount other users owe me (Wait, no, totalOwed usually means what I owe)
+    const expenseCount = userExpenses.length;
+    
+    let totalSpending = 0;
+    let userShare = 0;
+    let totalPaid = 0;
+    let totalOwed = 0;
 
-  for (const split of userSplits) {
-    if (split.expense.creatorId === dbUser.id) {
-      totalSpending += split.expense.amount;
-      totalPaid += split.expense.amount;
-      userShare += split.amount;
-      // if I paid, I owe nothing, others owe me: expense.amount - my share
-    } else {
-      userShare += split.amount;
-      totalOwed += split.amount - split.paid;
+    for (const exp of userExpenses) {
+      const isCreator = exp.creatorId === dbUser.id;
+      if (isCreator) {
+        totalSpending += exp.amount;
+        totalPaid += exp.amount;
+      }
+
+      const mySplit = exp.splits.find((s) => s.userId === dbUser.id);
+      if (mySplit) {
+        userShare += mySplit.amount;
+        if (!isCreator) {
+          totalOwed += mySplit.amount - mySplit.paid;
+        }
+      }
     }
+
+    const netBalance = totalPaid - userShare;
+
+    return {
+      groupCount: memberships,
+      expenseCount,
+      totalSpending,
+      userShare,
+      totalPaid,
+      totalOwed,
+      netBalance,
+    };
+  } catch (err: any) {
+    console.error("[GET_ANALYTICS_OVERVIEW_DB_ERROR]", err?.message || err);
+    return EMPTY_OVERVIEW;
   }
-
-  // Calculate actual totalOwed (what I owe) and netBalance (totalPaid - userShare)
-  const netBalance = totalPaid - userShare;
-
-  return {
-    groupCount: memberships,
-    expenseCount,
-    totalSpending, // Total volume of expenses user is involved in
-    userShare,
-    totalPaid,
-    totalOwed,
-    netBalance,
-  };
 }
 
 export async function getAnalyticsTrends(groupId?: string, months = 6) {
-  const { userId } = await requireAuth();
-  if (!userId) throw new Error("Unauthorized");
+  const session = await getSession();
+  if (!session?.userId) return [];
 
   const dbUser = await getOrCreateCurrentUser();
+  if (!dbUser) return [];
 
-  const whereCondition: any = {
-    date: {
-      gte: new Date(new Date().setMonth(new Date().getMonth() - months)),
-    },
-  };
-  
-  if (groupId) {
-    whereCondition.groupId = groupId;
-  }
+  try {
+    const minDate = new Date();
+    minDate.setMonth(minDate.getMonth() - months);
 
-  const userSplits = await prisma.split.findMany({
-    where: { 
-      userId: dbUser.id,
-      expense: whereCondition,
-    },
-    include: { expense: true },
-  });
-
-  const trendMap = new Map<string, { totalSpending: number, userShare: number }>();
-  
-  for (const split of userSplits) {
-    const month = split.expense.date.getMonth() + 1; // 1-12
-    const year = split.expense.date.getFullYear();
-    const key = `${year}-${month}`;
-    
-    if (!trendMap.has(key)) {
-      trendMap.set(key, { totalSpending: 0, userShare: 0 });
-    }
-    
-    const entry = trendMap.get(key)!;
-    entry.userShare += split.amount;
-    if (split.expense.creatorId === dbUser.id) {
-       // Only add to total spending if the user is involved and it was created by them?
-       // Let's add the total volume to totalSpending
-       entry.totalSpending += split.expense.amount;
-    }
-  }
-
-  const result = Array.from(trendMap.entries()).map(([key, data]) => {
-    const [yearStr, monthStr] = key.split('-');
-    return {
-      month: parseInt(monthStr),
-      year: parseInt(yearStr),
-      totalSpending: data.totalSpending,
-      userShare: data.userShare,
+    const whereCondition: any = {
+      date: {
+        gte: minDate,
+      },
     };
-  });
+    
+    if (groupId) {
+      whereCondition.groupId = groupId;
+    }
 
-  return result.sort((a, b) => {
-    if (a.year === b.year) return a.month - b.month;
-    return a.year - b.year;
-  });
+    const userExpenses = await prisma.expense.findMany({
+      where: {
+        ...whereCondition,
+        OR: [
+          { creatorId: dbUser.id },
+          { splits: { some: { userId: dbUser.id } } },
+        ],
+      },
+      include: { splits: true },
+    });
+
+    const trendMap = new Map<string, { totalSpending: number; userShare: number }>();
+    
+    for (const exp of userExpenses) {
+      const month = exp.date.getMonth() + 1; // 1-12
+      const year = exp.date.getFullYear();
+      const monthStr = String(month).padStart(2, "0");
+      const key = `${year}-${monthStr}`;
+      
+      if (!trendMap.has(key)) {
+        trendMap.set(key, { totalSpending: 0, userShare: 0 });
+      }
+      
+      const entry = trendMap.get(key)!;
+      const mySplit = exp.splits.find((s) => s.userId === dbUser.id);
+      if (mySplit) {
+        entry.userShare += mySplit.amount;
+      }
+      if (exp.creatorId === dbUser.id) {
+        entry.totalSpending += exp.amount;
+      }
+    }
+
+    const result = Array.from(trendMap.entries()).map(([key, data]) => {
+      return {
+        month: key, // "YYYY-MM" format per TrendPoint interface
+        totalSpending: data.totalSpending,
+        userShare: data.userShare,
+      };
+    });
+
+    return result.sort((a, b) => a.month.localeCompare(b.month));
+  } catch (err: any) {
+    console.error("[GET_ANALYTICS_TRENDS_DB_ERROR]", err?.message || err);
+    return [];
+  }
 }

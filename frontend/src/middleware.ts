@@ -1,25 +1,26 @@
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/dashboard", "/groups", "/expenses", "/settlements", "/analytics", "/settings", "/profile"];
-const publicRoutes = ["/login", "/register", "/"];
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/groups(.*)", "/expenses(.*)", "/settlements(.*)", "/analytics(.*)", "/settings(.*)", "/profile(.*)"]);
+const isPublicRoute = createRouteMatcher(["/login(.*)", "/register(.*)", "/"]);
 
-export function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
-  const isPublicRoute = publicRoutes.includes(path);
-  const token = req.cookies.get("auth-token")?.value;
+export default clerkMiddleware((auth, req) => {
+  const { userId } = auth();
 
-  if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  if (isProtectedRoute(req)) {
+    if (!userId) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   }
 
-  if (isPublicRoute && token) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (isPublicRoute(req)) {
+    if (userId) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [

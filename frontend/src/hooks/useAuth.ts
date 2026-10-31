@@ -1,45 +1,39 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser, useClerk } from "@clerk/nextjs";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getCurrentUserOrNull } from "@/lib/actions/user";
 
 export function useAuth() {
-  const [user, setUser] = useState<any>(null);
-  const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const refreshUser = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-        setStatus("authenticated");
-      } else {
-        setUser(null);
-        setStatus("unauthenticated");
-      }
-    } catch (e) {
-      setUser(null);
-      setStatus("unauthenticated");
-    }
-  };
+  const { data: prismaUser, isLoading: isDbLoading, refetch } = useQuery({
+    queryKey: ["auth-user", clerkUser?.id],
+    queryFn: () => getCurrentUserOrNull(),
+    enabled: !!isSignedIn && !!clerkUser,
+    staleTime: Infinity,
+  });
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
+  const isLoading = !isLoaded || (isSignedIn && isDbLoading);
+  const status = isLoading 
+    ? "loading" 
+    : (isSignedIn && prismaUser ? "authenticated" : "unauthenticated");
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
-    setStatus("unauthenticated");
+    await signOut();
+    queryClient.clear();
     router.push("/login");
   };
 
   return {
-    user,
+    user: prismaUser || null,
     status,
     login: async () => { router.push("/login") },
     register: async () => { router.push("/register") },
     logout,
-    refreshUser,
+    refreshUser: async () => { if (isSignedIn) await refetch(); },
   };
 }

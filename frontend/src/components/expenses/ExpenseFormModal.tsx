@@ -121,7 +121,7 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
       })
     );
     setInitializedForGroup(selectedGroupId);
-  }, [members, selectedGroupId]);
+  }, [members, selectedGroupId, initializedForGroup, editingExpense]);
 
   function validateSplit(): boolean {
     const included = participants.filter((p) => p.included);

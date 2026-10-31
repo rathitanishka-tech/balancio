@@ -9,6 +9,7 @@ import { SearchDialog } from "@/components/search/SearchDialog";
 import { ExpenseFormModal } from "@/components/expenses/ExpenseFormModal";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/layout/Logo";
+import { AiChatModal } from "@/components/ai/AiChatModal";
 
 /**
  * Every route under (dashboard) requires authentication - this is where
@@ -22,6 +23,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [quickAddOpen, setQuickAddOpen] = React.useState(false);
+  const [aiOpen, setAiOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
@@ -59,13 +61,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-bg-base bg-noise">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Navbar onOpenSearch={() => setSearchOpen(true)} />
+        <Navbar onOpenSearch={() => setSearchOpen(true)} onOpenAi={() => setAiOpen(true)} />
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:px-6 lg:pb-10">{children}</main>
       </div>
 
       <MobileBottomNav onAddExpense={() => setQuickAddOpen(true)} />
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
       {quickAddOpen && <ExpenseFormModal open={quickAddOpen} onOpenChange={setQuickAddOpen} />}
+      <AiChatModal open={aiOpen} onOpenChange={setAiOpen} />
     </div>
   );
 }

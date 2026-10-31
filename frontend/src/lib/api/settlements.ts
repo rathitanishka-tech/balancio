@@ -1,5 +1,4 @@
-import { apiRequest } from "@/lib/api/client";
-import { getSettlements, createSettlement } from "@/lib/actions/settlements";
+import { getSettlements, createSettlement, deleteSettlement } from "@/lib/actions/settlements";
 import type { CreateSettlementPayload, Settlement, SettlementFilters } from "@/types/settlement";
 import type { PaginationMeta } from "@/types/api";
 
@@ -14,7 +13,7 @@ export const settlementsApi = {
     return data as SettlementListResult;
   },
 
-  async get(settlementId: string): Promise<Settlement> {
+  async get(_settlementId: string): Promise<Settlement> {
     throw new Error("Not implemented yet");
   },
 
@@ -24,6 +23,6 @@ export const settlementsApi = {
   },
 
   async remove(settlementId: string): Promise<void> {
-    await apiRequest<void>(`/settlements/${settlementId}`, { method: "DELETE" });
+    await deleteSettlement(settlementId);
   }
 };

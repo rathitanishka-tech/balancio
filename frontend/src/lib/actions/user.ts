@@ -1,22 +1,55 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth/session";
+import { getSession, requireAuth } from "@/lib/auth/session";
 import { prisma } from "../db";
 
-export async function getOrCreateCurrentUser() {
-  const { userId } = await requireAuth();
+export async function getCurrentUserOrNull() {
+  const session = await getSession();
   
-  if (!userId) {
+  if (!session?.userId) {
+    return null;
+  }
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.userId },
+    });
+
+    if (!dbUser) {
+      return null;
+    }
+
+    // Never leak password hash to the client
+    const { password: _, ...safeUser } = dbUser;
+    return safeUser;
+  } catch (err: any) {
+    console.error("[GET_CURRENT_USER_DB_ERROR]", err?.message || err);
+    return null;
+  }
+}
+
+export async function getOrCreateCurrentUser() {
+  const user = await getCurrentUserOrNull();
+  if (!user) {
     throw new Error("Unauthorized");
   }
+  return user;
+}
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: userId },
-  });
+export async function updateUserProfile(payload: { name?: string; avatar?: string }) {
+  const { userId } = await requireAuth();
+  if (!userId) throw new Error("Unauthorized");
 
-  if (!dbUser) {
-    throw new Error("User not found");
+  const updateData: { name?: string } = {};
+  if (payload.name && payload.name.trim()) {
+    updateData.name = payload.name.trim();
   }
 
-  return dbUser;
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: updateData,
+  });
+
+  const { password: _, ...safeUser } = updatedUser;
+  return safeUser;
 }

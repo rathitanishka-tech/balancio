@@ -20,8 +20,11 @@ export const viewport: Viewport = {
   ]
 };
 
+import { ClerkProvider } from '@clerk/nextjs'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
+    <ClerkProvider>
       <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
         <body className="min-h-screen bg-bg-base font-sans text-ink-primary antialiased">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -34,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ThemeProvider>
         </body>
       </html>
+    </ClerkProvider>
   );
 }
 
