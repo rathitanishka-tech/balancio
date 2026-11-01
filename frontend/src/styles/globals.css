@@ -17,52 +17,54 @@
  * near-black surfaces above without turning neon.
  */
 :root {
-  /* LIGHT MODE TOKENS */
-  --bg-base: #f7f8fa;
+  /* LIGHT MODE TOKENS — Midnight Finance Light */
+  --bg-base: #f5f8ff;
   --bg-elevated: #ffffff;
-  --bg-alt: #eef1f5;
+  --bg-alt: #edf3ff;
 
-  --surface-1: rgba(255, 255, 255, 0.65);
-  --surface-2: rgba(255, 255, 255, 0.85);
+  --surface-1: rgba(255, 255, 255, 0.75);
+  --surface-2: rgba(237, 243, 255, 0.85);
   --surface-3: #ffffff;
 
-  --text-primary: #111318;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #101828;
+  --text-secondary: #59677d;
+  --text-muted: #8c9ba5;
 
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
+  --border-subtle: rgba(36, 93, 219, 0.1);
+  --border-strong: rgba(36, 93, 219, 0.2);
 
-  --accent-violet: #6d28d9;
+  --accent-violet: #6366f1;
   --accent-indigo: #4f46e5;
-  --accent-cyan: #0891b2;
-  --accent-emerald: #059669;
-  --accent-blue: #2563eb;
-  --accent-rose: #e11d48;
+  --accent-cyan: #0284c7;
+  --accent-emerald: #10b981;
+  --accent-blue: #245ddb;
+  --accent-blue-electric: #477fea;
+  --accent-rose: #ef4444;
 }
 
 .dark {
-  /* DARK MODE TOKENS */
-  --bg-base: #050505;
-  --bg-elevated: #08090b;
-  --bg-alt: #0d0f12;
+  /* DARK MODE TOKENS — Midnight Finance Dark */
+  --bg-base: #070b14;
+  --bg-elevated: #0b1220;
+  --bg-alt: #101b2d;
 
-  --surface-1: #111318;
-  --surface-2: #15171c;
-  --surface-3: #191c22;
+  --surface-1: rgba(16, 27, 45, 0.75);
+  --surface-2: rgba(20, 35, 58, 0.62);
+  --surface-3: #132238;
 
-  --text-primary: #f5f5f5;
-  --text-secondary: #9a9fa8;
-  --text-muted: #646972;
+  --text-primary: #f4f7ff;
+  --text-secondary: #a4b1c8;
+  --text-muted: #62728d;
 
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(117, 181, 255, 0.1);
+  --border-strong: rgba(117, 181, 255, 0.2);
 
   --accent-violet: #7c6cf5;
   --accent-indigo: #6366f1;
-  --accent-cyan: #22d3ee;
+  --accent-cyan: #59d8ff;
   --accent-emerald: #34d399;
-  --accent-blue: #60a5fa;
+  --accent-blue: #4f8cff;
+  --accent-blue-electric: #75b5ff;
   --accent-rose: #fb7185;
 }
 
@@ -117,6 +119,21 @@ body {
   backdrop-filter: blur(24px) saturate(150%);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
   border: 1px solid var(--border-strong);
+}
+
+/* Midnight Finance atmospheric lighting and grid detail */
+.bg-midnight-grid {
+  background-image: 
+    linear-gradient(to right, rgba(36, 93, 219, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(36, 93, 219, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.dark .bg-midnight-grid {
+  background-image: 
+    linear-gradient(to right, rgba(117, 181, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(117, 181, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
 }
 
 /* Thin liquid sheen highlight, meant to sit inside a `relative overflow-hidden` container. */

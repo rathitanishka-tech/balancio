@@ -42,7 +42,10 @@ const config: Config = {
           indigo: "var(--accent-indigo)",
           cyan: "var(--accent-cyan)",
           emerald: "var(--accent-emerald)",
-          blue: "var(--accent-blue)",
+          blue: {
+            DEFAULT: "var(--accent-blue)",
+            electric: "var(--accent-blue-electric)"
+          },
           rose: "var(--accent-rose)"
         }
       },
@@ -59,7 +62,9 @@ const config: Config = {
       boxShadow: {
         soft: "0 1px 0 0 rgba(255,255,255,0.04) inset, 0 12px 32px -16px rgba(0,0,0,0.55)",
         lift: "0 1px 0 0 rgba(255,255,255,0.05) inset, 0 24px 48px -20px rgba(0,0,0,0.65)",
-        glow: "0 0 0 1px rgba(124,108,245,0.25), 0 0 24px -4px rgba(124,108,245,0.45)"
+        glow: "0 0 0 1px rgba(79,140,255,0.25), 0 0 32px -4px rgba(79,140,255,0.45)",
+        "glow-blue": "0 0 0 1px rgba(79,140,255,0.28), 0 0 36px -4px rgba(79,140,255,0.45)",
+        "glow-cyan": "0 0 0 1px rgba(89,216,255,0.25), 0 0 32px -4px rgba(89,216,255,0.4)"
       },
       backgroundImage: {
         "liquid-radial":

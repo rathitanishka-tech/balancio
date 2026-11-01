@@ -43,8 +43,6 @@
     "node_modules",
     ".next",
     "dist",
-    "tests",
-    "jest.config.js",
-    "jest.setup.ts"
+    "jest.config.js"
   ]
 }

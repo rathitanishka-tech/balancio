@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 
 export interface LiquidButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
+  variant?: "blue" | "violet";
 }
 
 /**
@@ -16,14 +17,20 @@ export interface LiquidButtonProps extends React.ButtonHTMLAttributes<HTMLButton
  * everyday button used everywhere else).
  */
 export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProps>(
-  ({ className, loading, disabled, children, ...props }, ref) => {
+  ({ className, loading, disabled, variant = "blue", children, ...props }, ref) => {
+    const variantStyles =
+      variant === "violet"
+        ? "bg-gradient-to-br from-accent-violet to-indigo-600 hover:shadow-[0_0_0_1px_rgba(124,108,245,0.35),0_0_36px_-4px_rgba(124,108,245,0.6)]"
+        : "bg-gradient-to-r from-accent-blue via-accent-blue to-accent-indigo hover:shadow-[0_0_0_1px_rgba(79,140,255,0.35),0_0_36px_-4px_rgba(79,140,255,0.6)]";
+
     return (
       <button
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          "focus-ring group relative inline-flex h-12 items-center justify-center gap-2 overflow-hidden rounded-panel bg-gradient-to-br from-accent-violet to-indigo-600 px-6 text-sm font-semibold text-white shadow-glow transition-all duration-300 ease-liquid",
-          "hover:shadow-[0_0_0_1px_rgba(124,108,245,0.35),0_0_36px_-4px_rgba(124,108,245,0.6)] hover:-translate-y-0.5",
+          "focus-ring group relative inline-flex h-12 items-center justify-center gap-2 overflow-hidden rounded-panel px-6 text-sm font-semibold text-white shadow-glow transition-all duration-300 ease-liquid",
+          variantStyles,
+          "hover:-translate-y-0.5",
           "active:translate-y-0 active:scale-[0.98]",
           "disabled:pointer-events-none disabled:opacity-50",
           className

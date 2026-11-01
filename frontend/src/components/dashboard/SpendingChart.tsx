@@ -11,7 +11,21 @@ import { formatMoney, minorToMajor } from "@/lib/formatters/currency";
 import { formatMonthKey } from "@/lib/formatters/date";
 import { cn } from "@/lib/utils/cn";
 
-type Granularity = "weekly" | "monthly";
+export type Granularity = "weekly" | "monthly";
+
+export interface SpendingChartDataPoint {
+  label: string;
+  spending: number;
+}
+
+export interface SpendingChartViewProps {
+  data: SpendingChartDataPoint[];
+  granularity?: Granularity;
+  onGranularityChange?: (g: Granularity) => void;
+  isLoading?: boolean;
+  className?: string;
+  chartHeight?: number;
+}
 
 function bucketByWeek(expenses: { date: string; amount: number }[]): { label: string; spending: number }[] {
   const now = new Date();
@@ -35,25 +49,17 @@ function bucketByWeek(expenses: { date: string; amount: number }[]): { label: st
   return weeks.map((w) => ({ label: w.label, spending: w.spending }));
 }
 
-export function SpendingChart() {
-  const [granularity, setGranularity] = React.useState<Granularity>("monthly");
-  const trendsQuery = useAnalyticsTrends();
-  const expensesQuery = useExpenses({ limit: 100 });
-
-  const monthlyData = (trendsQuery.data ?? []).map((t) => ({
-    label: formatMonthKey(t.month),
-    spending: minorToMajor(t.totalSpending)
-  }));
-
-  const weeklyData = bucketByWeek(expensesQuery.data?.items.map((e) => ({ date: e.date, amount: e.amount })) ?? []).map(
-    (w) => ({ label: w.label, spending: minorToMajor(w.spending) })
-  );
-
-  const data = granularity === "monthly" ? monthlyData : weeklyData;
-  const isLoading = granularity === "monthly" ? trendsQuery.isLoading : expensesQuery.isLoading;
-
+/** Pure presentational component that can be safely used in both the dashboard and the public landing hero preview */
+export function SpendingChartView({
+  data,
+  granularity = "monthly",
+  onGranularityChange,
+  isLoading = false,
+  className,
+  chartHeight = 260
+}: SpendingChartViewProps) {
   return (
-    <GlassCard className="p-5">
+    <GlassCard className={cn("p-5", className)}>
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold text-ink-primary">Spending overview</h3>
@@ -63,7 +69,8 @@ export function SpendingChart() {
           {(["weekly", "monthly"] as const).map((g) => (
             <button
               key={g}
-              onClick={() => setGranularity(g)}
+              type="button"
+              onClick={() => onGranularityChange?.(g)}
               className={cn(
                 "rounded-[8px] px-3 py-1 text-xs font-medium capitalize transition-colors",
                 granularity === g ? "bg-surface-2 text-ink-primary" : "text-ink-muted hover:text-ink-secondary"
@@ -80,7 +87,7 @@ export function SpendingChart() {
       ) : data.length === 0 ? (
         <div className="flex h-64 items-center justify-center text-sm text-ink-muted">No spending data yet.</div>
       ) : (
-        <ResponsiveContainer width="100%" height={260}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <AreaChart data={data} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
             <defs>
               <linearGradient id="spendingFill" x1="0" y1="0" x2="0" y2="1">
@@ -113,5 +120,33 @@ export function SpendingChart() {
         </ResponsiveContainer>
       )}
     </GlassCard>
+  );
+}
+
+/** Authenticated container connected to live React Query analytics hooks */
+export function SpendingChart() {
+  const [granularity, setGranularity] = React.useState<Granularity>("monthly");
+  const trendsQuery = useAnalyticsTrends();
+  const expensesQuery = useExpenses({ limit: 100 });
+
+  const monthlyData = (trendsQuery.data ?? []).map((t) => ({
+    label: formatMonthKey(t.month),
+    spending: minorToMajor(t.totalSpending)
+  }));
+
+  const weeklyData = bucketByWeek(expensesQuery.data?.items.map((e) => ({ date: e.date, amount: e.amount })) ?? []).map(
+    (w) => ({ label: w.label, spending: minorToMajor(w.spending) })
+  );
+
+  const data = granularity === "monthly" ? monthlyData : weeklyData;
+  const isLoading = granularity === "monthly" ? trendsQuery.isLoading : expensesQuery.isLoading;
+
+  return (
+    <SpendingChartView
+      data={data}
+      granularity={granularity}
+      onGranularityChange={setGranularity}
+      isLoading={isLoading}
+    />
   );
 }
