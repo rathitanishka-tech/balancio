@@ -6,9 +6,15 @@ import { LogOut, Settings, User as UserIcon } from "lucide-react";
 import { GlassDropdown } from "@/components/glass";
 import { MemberAvatar } from "@/components/common";
 import { useAuth } from "@/hooks/useAuth";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils/cn";
 
-export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
+export interface UserMenuProps {
+  collapsed?: boolean;
+  align?: "start" | "center" | "end";
+  className?: string;
+}
+
+export function UserMenu({ collapsed = false, align = "start", className }: UserMenuProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -21,9 +27,17 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
 
   return (
     <GlassDropdown
-      align="start"
+      align={align}
       trigger={
-        <button className="focus-ring flex w-full items-center gap-2.5 rounded-ctl p-2 text-left transition-colors hover:bg-surface-2">
+        <button
+          type="button"
+          aria-label={collapsed ? `User menu for ${user.name}` : undefined}
+          className={cn(
+            "focus-ring flex items-center rounded-ctl transition-colors hover:bg-surface-2",
+            collapsed ? "p-1.5 justify-center" : "w-full gap-2.5 p-2 text-left",
+            className
+          )}
+        >
           <MemberAvatar name={user.name} size="sm" />
           {!collapsed && (
             <span className="min-w-0 flex-1">

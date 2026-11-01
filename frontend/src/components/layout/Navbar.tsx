@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { UserButton } from "@clerk/nextjs";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -78,10 +78,17 @@ export function Navbar({ onOpenSearch, onOpenAi }: { onOpenSearch: () => void; o
           </Button>
           <ThemeToggle />
           <NotificationBell />
-          <div className="hidden sm:flex items-center gap-2">
-            {user && <span className="text-sm font-medium">{user.name}</span>}
-            <UserButton afterSignOutUrl="/login" />
-            <Button variant="ghost" size="icon" onClick={logout} title="Log out (Native)">
+          <div className="flex items-center gap-1 sm:gap-2">
+            {user && <span className="hidden md:inline text-sm font-medium text-ink-primary">{user.name}</span>}
+            <UserMenu collapsed align="end" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={logout}
+              title="Log out"
+              aria-label="Log out"
+              className="text-ink-secondary hover:text-ink-primary hover:bg-surface-2"
+            >
               <LogOut className="h-[18px] w-[18px]" />
             </Button>
           </div>
