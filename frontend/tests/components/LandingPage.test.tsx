@@ -80,11 +80,16 @@ describe("Cinematic Landing Page — Balancio", () => {
 
     const { container } = render(<LandingView />);
 
-    // Verify left-aligned layout structure (lg:col-span-5 for messaging, lg:col-span-7 for preview)
+    // Verify asymmetric two-column layout structure & cohesive showcase container
     const leftColumn = container.querySelector(".lg\\:col-span-5");
     const rightColumn = container.querySelector(".lg\\:col-span-7");
     expect(leftColumn).toBeInTheDocument();
     expect(rightColumn).toBeInTheDocument();
+
+    const previewStage = screen.getByTestId("hero-preview-stage");
+    expect(previewStage).toBeInTheDocument();
+    expect(screen.getByText(/Your Balance/i)).toBeInTheDocument();
+    expect(screen.getByText(/Recent Activity/i)).toBeInTheDocument();
 
     // Verify Single Card Content
     expect(screen.getAllByText(/Group overview/i).length).toBeGreaterThanOrEqual(1);
