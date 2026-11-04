@@ -16,14 +16,14 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "focus-ring flex h-10 w-full items-center justify-between gap-2 rounded-ctl border border-line-subtle bg-surface-1/80 px-3.5 py-2 text-sm text-ink-primary transition-colors hover:border-line-strong disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "flex h-10 w-full items-center justify-between gap-2 rounded-ctl border border-[#DCE3ED] dark:border-[#26354B] bg-[#F4F6FA] dark:bg-[#111B2B] px-3.5 py-2 text-sm text-[#172033] dark:text-[#E8EDF6] transition-colors duration-150 hover:bg-[#EAEFF6] dark:hover:bg-[#152136] hover:border-[#B0BFD3] dark:hover:border-[#374864] focus:outline-none focus:border-[#4D8DFF] dark:focus:border-[#4D8DFF] focus:ring-2 focus:ring-[#4D8DFF]/25 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 shrink-0 text-ink-muted" />
+      <ChevronDown className="h-4 w-4 shrink-0 text-[#8995A7] dark:text-[#8795A9]" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -38,7 +38,7 @@ const SelectContent = React.forwardRef<
       ref={ref}
       position={position}
       className={cn(
-        "glass-surface-strong z-50 min-w-[8rem] overflow-hidden rounded-card text-ink-primary shadow-lift animate-scale-in",
+        "z-50 min-w-[8rem] overflow-hidden rounded-card border border-[#DCE3ED] dark:border-[#26354B] bg-[#FFFFFF] dark:bg-[#080D18] text-[#172033] dark:text-[#E8EDF6] shadow-xl animate-scale-in",
         position === "popper" && "translate-y-1",
         className
       )}
@@ -57,7 +57,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-[8px] py-2 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-surface-2 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex w-full cursor-pointer select-none items-center rounded-[8px] py-2 pl-8 pr-2 text-sm text-[#172033] dark:text-[#E8EDF6] outline-none transition-colors hover:bg-[#EAEFF6] dark:hover:bg-[#152136] focus:bg-[#EAEFF6] dark:focus:bg-[#152136] focus:text-[#172033] dark:focus:text-[#E8EDF6] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}

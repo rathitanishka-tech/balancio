@@ -47,6 +47,21 @@ const config: Config = {
             electric: "var(--accent-blue-electric)"
           },
           rose: "var(--accent-rose)"
+        },
+        modal: {
+          bg: "var(--modal-bg)",
+          border: "var(--modal-border)"
+        },
+        form: {
+          bg: "var(--input-bg)",
+          "bg-hover": "var(--input-bg-hover)",
+          border: "var(--input-border)",
+          "border-hover": "var(--input-border-hover)",
+          text: "var(--input-text)",
+          placeholder: "var(--input-placeholder)",
+          label: "var(--input-label)",
+          "focus-border": "var(--input-focus-border)",
+          "focus-ring": "var(--input-focus-ring)"
         }
       },
       fontFamily: {

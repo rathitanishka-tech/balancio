@@ -17,7 +17,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-fade-in",
+      "fixed inset-0 z-50 bg-black/70 data-[state=open]:animate-fade-in",
       className
     )}
     {...props}
@@ -34,7 +34,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "glass-surface-strong fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-modal p-6 shadow-lift",
+        "fixed left-1/2 top-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-modal border border-[#DCE3ED] dark:border-[#26354B] bg-[#FFFFFF] dark:bg-[#080D18] p-6 text-[#172033] dark:text-[#E8EDF6] shadow-2xl max-w-lg",
         "max-h-[90vh] overflow-y-auto",
         "data-[state=open]:animate-modal-scale-in",
         className
@@ -43,7 +43,7 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {!hideClose && (
-        <DialogPrimitive.Close className="focus-ring absolute right-4 top-4 rounded-full p-1.5 text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink-primary">
+        <DialogPrimitive.Close className="focus-ring absolute right-4 top-4 rounded-full p-1.5 text-[#8995A7] dark:text-[#8795A9] transition-colors hover:bg-[#EAEFF6] dark:hover:bg-[#152136] hover:text-[#172033] dark:hover:text-[#E8EDF6]">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

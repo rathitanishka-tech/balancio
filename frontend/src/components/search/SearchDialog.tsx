@@ -63,17 +63,17 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent hideClose className="max-w-xl gap-0 overflow-hidden p-0">
-        <div className="flex items-center gap-2.5 border-b border-line-subtle px-4 py-3.5">
-          <Search className="h-4 w-4 shrink-0 text-ink-muted" />
+      <DialogContent hideClose className="w-full max-w-[95vw] sm:max-w-xl gap-0 overflow-hidden p-0 border border-modal-border bg-modal-bg shadow-2xl">
+        <div className="flex items-center gap-2.5 border-b border-modal-border px-4 py-3.5">
+          <Search className="h-4 w-4 shrink-0 text-form-placeholder" />
           <Input
             autoFocus
             placeholder="Search Balancio…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+            className="h-auto border-0 bg-transparent dark:bg-transparent p-0 text-sm shadow-none hover:border-0 hover:bg-transparent focus:border-0 focus:ring-0 focus-visible:ring-0 text-[#172033] dark:text-[#E8EDF6] placeholder:text-[#8995A7] dark:placeholder:text-[#8795A9]"
           />
-          <kbd className="rounded-[6px] border border-line-strong px-1.5 py-0.5 text-[10px] text-ink-muted">esc</kbd>
+          <kbd className="rounded-[6px] border border-modal-border px-1.5 py-0.5 text-[10px] text-form-placeholder">esc</kbd>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto p-2">

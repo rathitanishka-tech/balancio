@@ -81,6 +81,7 @@ export function SettleUpModal({
       onOpenChange={onOpenChange}
       title="Settle payment"
       description={`You are recording a payment to ${toUserName}.`}
+      className="w-full max-w-[95vw] sm:max-w-lg"
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <GlassInput
@@ -91,7 +92,7 @@ export function SettleUpModal({
           error={errors.amount?.message}
           {...register("amount", { valueAsNumber: true })}
         />
-        <p className="-mt-2 text-xs text-ink-muted">Suggested from current balance: {formatMoney(suggestedAmount, currency)}</p>
+        <p className="-mt-2 text-xs text-[#8995A7] dark:text-[#8795A9]">Suggested from current balance: {formatMoney(suggestedAmount, currency)}</p>
 
         <GlassSelect
           label="Payment method"
@@ -101,7 +102,7 @@ export function SettleUpModal({
         />
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="settlement-note">Note</Label>
+          <Label htmlFor="settlement-note" className="text-[#556477] dark:text-[#AAB6C8] text-sm font-medium">Note</Label>
           <Textarea id="settlement-note" placeholder="Optional" {...register("note")} />
         </div>
 

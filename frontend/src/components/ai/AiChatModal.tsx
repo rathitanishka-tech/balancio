@@ -53,7 +53,7 @@ export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
       onOpenChange={onOpenChange}
       title="Balancio AI"
       description="Ask questions naturally and get instant financial clarity."
-      className="max-w-lg"
+      className="w-full max-w-[95vw] sm:max-w-lg"
     >
       <div className="flex h-[50vh] flex-col gap-4">
         <div ref={scrollRef} className="flex-1 overflow-y-auto pr-2 space-y-4">

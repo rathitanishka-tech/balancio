@@ -68,11 +68,12 @@ export function GroupFormModal({ open, onOpenChange, group }: GroupFormModalProp
       onOpenChange={onOpenChange}
       title={isEditing ? "Edit group" : "Create a group"}
       description={isEditing ? undefined : "Give it a name your friends will recognize."}
+      className="w-full max-w-[95vw] sm:max-w-lg"
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <GlassInput label="Group name" placeholder="Goa Trip" error={errors.name?.message} {...register("name")} />
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="group-description">Description</Label>
+          <Label htmlFor="group-description" className="text-[#556477] dark:text-[#AAB6C8] text-sm font-medium">Description</Label>
           <Textarea id="group-description" placeholder="Optional" {...register("description")} />
           {errors.description && <p className="text-xs text-accent-rose">{errors.description.message}</p>}
         </div>

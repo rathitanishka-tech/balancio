@@ -63,6 +63,7 @@ export function AddMemberModal({
       onOpenChange={onOpenChange}
       title="Add a member"
       description="If they already have an account, they're added immediately. Otherwise, we'll send an invitation."
+      className="w-full max-w-[95vw] sm:max-w-md"
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
         <GlassInput

@@ -16,7 +16,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn("fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-fade-in", className)}
+    className={cn("fixed inset-0 z-50 bg-black/70 data-[state=open]:animate-fade-in", className)}
     {...props}
   />
 ));
@@ -37,17 +37,18 @@ const SheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "glass-surface-strong fixed inset-x-0 bottom-0 z-50 flex max-h-[92vh] flex-col gap-4 rounded-t-modal p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-lift",
+        "fixed inset-x-0 bottom-0 z-50 flex max-h-[92vh] flex-col gap-4 rounded-t-modal border-t border-[#DCE3ED] dark:border-[#26354B] bg-[#FFFFFF] dark:bg-[#080D18] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-[#172033] dark:text-[#E8EDF6] shadow-2xl overflow-y-auto",
         "data-[state=open]:animate-slide-up",
         // Desktop: centered modal
-        "sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-modal sm:data-[state=open]:animate-modal-scale-in",
+        "sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-modal sm:border sm:border-[#DCE3ED] dark:sm:border-[#26354B] sm:data-[state=open]:animate-modal-scale-in",
+        "max-w-lg",
         className
       )}
       {...props}
     >
-      <div className="mx-auto -mt-1 mb-1 h-1 w-10 shrink-0 rounded-full bg-line-strong sm:hidden" aria-hidden="true" />
+      <div className="mx-auto -mt-1 mb-1 h-1 w-10 shrink-0 rounded-full bg-[#DCE3ED] dark:bg-[#26354B] sm:hidden" aria-hidden="true" />
       {children}
-      <DialogPrimitive.Close className="focus-ring absolute right-4 top-4 rounded-full p-1.5 text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink-primary">
+      <DialogPrimitive.Close className="focus-ring absolute right-4 top-4 rounded-full p-1.5 text-[#8995A7] dark:text-[#8795A9] transition-colors hover:bg-[#EAEFF6] dark:hover:bg-[#152136] hover:text-[#172033] dark:hover:text-[#E8EDF6]">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>

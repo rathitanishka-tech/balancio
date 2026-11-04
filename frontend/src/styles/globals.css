@@ -40,12 +40,26 @@
   --accent-blue: #245ddb;
   --accent-blue-electric: #477fea;
   --accent-rose: #ef4444;
+
+  /* FORM & MODAL TOKENS — Light Mode */
+  --modal-bg: #ffffff;
+  --modal-border: #dce3ed;
+
+  --input-bg: #f4f6fa;
+  --input-bg-hover: #eaeff6;
+  --input-border: #dce3ed;
+  --input-border-hover: #b0bfd3;
+  --input-text: #172033;
+  --input-placeholder: #8995a7;
+  --input-label: #556477;
+  --input-focus-border: #4d8dff;
+  --input-focus-ring: rgba(77, 141, 255, 0.2);
 }
 
 .dark {
   /* DARK MODE TOKENS — Midnight Finance Dark */
   --bg-base: #070b14;
-  --bg-elevated: #0b1220;
+  --bg-elevated: #080d18;
   --bg-alt: #101b2d;
 
   --surface-1: rgba(16, 27, 45, 0.75);
@@ -66,6 +80,20 @@
   --accent-blue: #4f8cff;
   --accent-blue-electric: #75b5ff;
   --accent-rose: #fb7185;
+
+  /* FORM & MODAL TOKENS — Dark Mode */
+  --modal-bg: #080d18;
+  --modal-border: #26354b;
+
+  --input-bg: #111b2b;
+  --input-bg-hover: #152136;
+  --input-border: #26354b;
+  --input-border-hover: #374864;
+  --input-text: #e8edf6;
+  --input-placeholder: #8795a9;
+  --input-label: #aab6c8;
+  --input-focus-border: #4d8dff;
+  --input-focus-ring: rgba(77, 141, 255, 0.25);
 }
 
 * {
@@ -78,6 +106,125 @@ html {
 
 html.dark {
   color-scheme: dark;
+}
+
+/* =========================================================================
+   CLERK AUTHENTICATION EXCEPTION:
+   Clerk fields must remain white and follow Clerk's default light styling.
+   Do not override Clerk inputs with Balancio theme tokens.
+   ========================================================================= */
+.cl-rootBox,
+.cl-card,
+.cl-formFieldInput,
+[class*="cl-"] {
+  --tw-shadow: none;
+}
+
+.cl-rootBox input,
+.cl-card input,
+[class*="cl-"] input {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+  color-scheme: light !important;
+}
+
+.cl-rootBox input::placeholder,
+.cl-card input::placeholder,
+[class*="cl-"] input::placeholder {
+  color: #9ca3af !important;
+}
+
+.cl-rootBox input:-webkit-autofill,
+.cl-card input:-webkit-autofill,
+[class*="cl-"] input:-webkit-autofill {
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+}
+
+/* =========================================================================
+   NON-CLERK FORM CONTROLS & PICKERS (BALANCIO THEME)
+   ========================================================================= */
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"],
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="number"],
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="time"] {
+  color-scheme: light;
+}
+
+.dark input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"],
+.dark input:not([class*="cl-"]):not(.cl-rootBox *)[type="number"],
+.dark input:not([class*="cl-"]):not(.cl-rootBox *)[type="time"] {
+  color-scheme: dark;
+}
+
+/* Date input calendar picker indicator */
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.dark input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85) brightness(1.2);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.dark input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Date field inner editor elements */
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-datetime-edit,
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-datetime-edit-text,
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-datetime-edit-month-field,
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-datetime-edit-day-field,
+input:not([class*="cl-"]):not(.cl-rootBox *)[type="date"]::-webkit-datetime-edit-year-field {
+  color: inherit;
+  background-color: transparent;
+}
+
+/* Explicit fallback solid backgrounds for all non-Clerk form controls */
+input:not([class*="cl-"]):not(.cl-rootBox *):not([class*="bg-transparent"]) {
+  background-color: #F4F6FA;
+  color: #172033;
+}
+.dark input:not([class*="cl-"]):not(.cl-rootBox *):not([class*="bg-transparent"]) {
+  background-color: #111B2B;
+  color: #E8EDF6;
+}
+textarea:not([class*="cl-"]):not(.cl-rootBox *) {
+  background-color: #F4F6FA;
+  color: #172033;
+}
+.dark textarea:not([class*="cl-"]):not(.cl-rootBox *) {
+  background-color: #111B2B;
+  color: #E8EDF6;
+}
+
+/* Browser autofill override for non-Clerk form controls */
+input:not([class*="cl-"]):not(.cl-rootBox *):-webkit-autofill,
+input:not([class*="cl-"]):not(.cl-rootBox *):-webkit-autofill:hover,
+input:not([class*="cl-"]):not(.cl-rootBox *):-webkit-autofill:focus,
+input:not([class*="cl-"]):not(.cl-rootBox *):-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--input-text) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  caret-color: var(--input-text) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 body {

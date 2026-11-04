@@ -195,21 +195,21 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
       onOpenChange={onOpenChange}
       title={isEditing ? "Edit expense" : "Add expense"}
       description="The backend calculates the final shares - you just describe how to split it."
-      className="max-w-2xl"
+      className="w-full max-w-[760px] md:max-w-[790px] lg:max-w-[820px] p-6 sm:p-8"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         {!isEditing && (
-          <TabsList className="mb-4 grid w-full grid-cols-1 bg-surface-1">
+          <TabsList className="mb-4 grid w-full grid-cols-1">
             <TabsTrigger value="manual">Manual</TabsTrigger>
           </TabsList>
         )}
         
-        <TabsContent value="manual">
+        <TabsContent value="manual" className="mt-0">
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
             <fieldset className="flex flex-col gap-4">
-              <legend className="mb-1 text-xs font-medium uppercase tracking-wider text-ink-muted">Expense details</legend>
+              <legend className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#556477] dark:text-[#AAB6C8]">Expense details</legend>
               <GlassInput label="Title" placeholder="Dinner at the beach shack" error={errors.title?.message} {...register("title", { required: "Give this expense a title" })} />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GlassInput
                   label="Amount"
                   type="number"
@@ -230,7 +230,7 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
             </fieldset>
 
             <fieldset className="flex flex-col gap-4">
-              <legend className="mb-1 text-xs font-medium uppercase tracking-wider text-ink-muted">Payment</legend>
+              <legend className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#556477] dark:text-[#AAB6C8]">Payment</legend>
               {!groupLocked && (
                 <GlassSelect
                   label="Group"
@@ -250,11 +250,11 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
             </fieldset>
 
             <fieldset className="flex flex-col gap-3">
-              <legend className="mb-1 text-xs font-medium uppercase tracking-wider text-ink-muted">
+              <legend className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#556477] dark:text-[#AAB6C8]">
                 Participants &amp; split
               </legend>
               {!selectedGroupId ? (
-                <p className="text-sm text-ink-muted">Choose a group to pick participants.</p>
+                <p className="text-sm text-[#556477] dark:text-[#AAB6C8]">Choose a group to pick participants.</p>
               ) : (
                 <SplitTypeSelector
                   amount={amount}
@@ -273,18 +273,18 @@ export function ExpenseFormModal({ open, onOpenChange, groupId, editingExpense }
             </fieldset>
 
             <fieldset className="flex flex-col gap-2">
-              <legend className="mb-1 text-xs font-medium uppercase tracking-wider text-ink-muted">
+              <legend className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#556477] dark:text-[#AAB6C8]">
                 Additional information
               </legend>
-              <Label htmlFor="expense-notes">Notes</Label>
+              <Label htmlFor="expense-notes" className="text-[#556477] dark:text-[#AAB6C8] text-sm font-medium">Notes</Label>
               <Textarea id="expense-notes" placeholder="Optional" {...register("notes")} />
             </fieldset>
 
-            <div className="flex flex-col-reverse gap-2 border-t border-line-subtle pt-4 sm:flex-row sm:justify-end">
+            <div className="sticky bottom-0 z-20 -mx-6 -mb-6 mt-2 border-t border-modal-border bg-modal-bg px-6 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.2)] sm:-mx-8 sm:-mb-8 sm:px-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button type="submit" loading={isSubmitting}>
+              <Button type="submit" loading={isSubmitting} className="min-w-[130px]">
                 {isEditing ? "Save changes" : "Add expense"}
               </Button>
             </div>

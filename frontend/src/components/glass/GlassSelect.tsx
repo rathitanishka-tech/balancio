@@ -37,14 +37,29 @@ export function GlassSelect({
 
   return (
     <div className={cn("flex flex-col gap-1.5", containerClassName)}>
-      {label && <Label htmlFor={id}>{label}</Label>}
+      {label && (
+        <Label htmlFor={id} className="text-[#556477] dark:text-[#AAB6C8] text-sm font-medium">
+          {label}
+        </Label>
+      )}
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger id={id} aria-invalid={Boolean(error)} className={className}>
+        <SelectTrigger
+          id={id}
+          aria-invalid={Boolean(error)}
+          className={cn(
+            "border-[#DCE3ED] dark:border-[#26354B] bg-[#F4F6FA] dark:bg-[#111B2B] text-[#172033] dark:text-[#E8EDF6] hover:bg-[#EAEFF6] dark:hover:bg-[#152136] hover:border-[#B0BFD3] dark:hover:border-[#374864] focus:border-[#4D8DFF] dark:focus:border-[#4D8DFF] focus:ring-2 focus:ring-[#4D8DFF]/25 focus:outline-none",
+            className
+          )}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="border-[#DCE3ED] dark:border-[#26354B] bg-[#FFFFFF] dark:bg-[#080D18] text-[#172033] dark:text-[#E8EDF6] shadow-xl">
           {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
+            <SelectItem
+              key={opt.value}
+              value={opt.value}
+              className="text-[#172033] dark:text-[#E8EDF6] hover:bg-[#EAEFF6] dark:hover:bg-[#152136] focus:bg-[#EAEFF6] dark:focus:bg-[#152136] focus:text-[#172033] dark:focus:text-[#E8EDF6]"
+            >
               {opt.label}
             </SelectItem>
           ))}

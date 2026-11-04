@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GlassSelect } from "@/components/glass";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useGroups } from "@/hooks/useGroups";
 import { EXPENSE_CATEGORIES } from "@/types/expense";
@@ -45,22 +46,24 @@ export function ExpenseFilters() {
         options={EXPENSE_CATEGORIES.map((c) => ({ value: c, label: c }))}
       />
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-ink-secondary" htmlFor="dateFrom">
-          From
-        </label>
+        <Label htmlFor="dateFrom" className="text-[#556477] dark:text-[#AAB6C8] text-sm font-medium">From</Label>
         <Input
           id="dateFrom"
           type="date"
           value={dateFrom}
           onChange={(e) => updateParam("dateFrom", e.target.value)}
-          className="w-40"
+          className="w-40 border-[#DCE3ED] dark:border-[#26354B] bg-[#F4F6FA] dark:bg-[#111B2B] text-[#172033] dark:text-[#E8EDF6]"
         />
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-ink-secondary" htmlFor="dateTo">
-          To
-        </label>
-        <Input id="dateTo" type="date" value={dateTo} onChange={(e) => updateParam("dateTo", e.target.value)} className="w-40" />
+        <Label htmlFor="dateTo" className="text-[#556477] dark:text-[#AAB6C8] text-sm font-medium">To</Label>
+        <Input
+          id="dateTo"
+          type="date"
+          value={dateTo}
+          onChange={(e) => updateParam("dateTo", e.target.value)}
+          className="w-40 border-[#DCE3ED] dark:border-[#26354B] bg-[#F4F6FA] dark:bg-[#111B2B] text-[#172033] dark:text-[#E8EDF6]"
+        />
       </div>
       {hasFilters && (
         <Button variant="ghost" size="sm" onClick={() => router.push("/expenses")}>

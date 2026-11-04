@@ -27,7 +27,7 @@ export function GlassModal({ open, onOpenChange, title, description, children, c
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className={cn("gap-4", className)}>
+        <SheetContent className={className}>
           <SheetHeader>
             <SheetTitle>{title}</SheetTitle>
             {description && <SheetDescription>{description}</SheetDescription>}
