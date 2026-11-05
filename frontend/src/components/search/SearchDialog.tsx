@@ -63,20 +63,32 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent hideClose className="w-full max-w-[95vw] sm:max-w-xl gap-0 overflow-hidden p-0 border border-modal-border bg-modal-bg shadow-2xl top-16 sm:top-1/2 translate-y-0 sm:-translate-y-1/2 rounded-2xl">
+      <DialogContent
+        hideClose
+        className="w-full sm:max-w-xl gap-0 overflow-hidden p-0 border-b sm:border border-modal-border bg-modal-bg shadow-2xl fixed inset-x-0 top-0 left-0 translate-x-0 translate-y-0 rounded-none sm:rounded-2xl sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 max-h-[85dvh] sm:max-h-[80vh]"
+      >
         <div className="flex items-center gap-2.5 border-b border-modal-border px-4 py-3.5">
           <Search className="h-4 w-4 shrink-0 text-form-placeholder" />
           <Input
             autoFocus
+            inputMode="search"
+            enterKeyHint="search"
             placeholder="Search Balancio…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-auto border-0 bg-transparent dark:bg-transparent p-0 text-sm shadow-none hover:border-0 hover:bg-transparent focus:border-0 focus:ring-0 focus-visible:ring-0 text-[#172033] dark:text-[#E8EDF6] placeholder:text-[#8995A7] dark:placeholder:text-[#8795A9]"
           />
-          <kbd className="rounded-[6px] border border-modal-border px-1.5 py-0.5 text-[10px] text-form-placeholder">esc</kbd>
+          <kbd className="hidden sm:inline-block rounded-[6px] border border-modal-border px-1.5 py-0.5 text-[10px] text-form-placeholder">esc</kbd>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="sm:hidden text-xs font-medium text-ink-secondary hover:text-ink-primary px-1.5 py-1 rounded"
+          >
+            Cancel
+          </button>
         </div>
 
-        <div className="max-h-[38dvh] sm:max-h-[60vh] overflow-y-auto p-2">
+        <div className="max-h-[calc(85dvh-3.5rem)] sm:max-h-[60vh] overflow-y-auto p-2">
           {!query.trim() && (
             <p className="px-3 py-8 text-center text-sm text-ink-muted">
               Search groups, expenses, and people across everything you&apos;re authorized to see.
