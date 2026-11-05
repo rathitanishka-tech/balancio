@@ -63,7 +63,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent hideClose className="w-full max-w-[95vw] sm:max-w-xl gap-0 overflow-hidden p-0 border border-modal-border bg-modal-bg shadow-2xl">
+      <DialogContent hideClose className="w-full max-w-[95vw] sm:max-w-xl gap-0 overflow-hidden p-0 border border-modal-border bg-modal-bg shadow-2xl top-16 sm:top-1/2 translate-y-0 sm:-translate-y-1/2 rounded-2xl">
         <div className="flex items-center gap-2.5 border-b border-modal-border px-4 py-3.5">
           <Search className="h-4 w-4 shrink-0 text-form-placeholder" />
           <Input
@@ -76,7 +76,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
           <kbd className="rounded-[6px] border border-modal-border px-1.5 py-0.5 text-[10px] text-form-placeholder">esc</kbd>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto p-2">
+        <div className="max-h-[38dvh] sm:max-h-[60vh] overflow-y-auto p-2">
           {!query.trim() && (
             <p className="px-3 py-8 text-center text-sm text-ink-muted">
               Search groups, expenses, and people across everything you&apos;re authorized to see.

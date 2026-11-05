@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { GlassModal } from "@/components/glass/GlassModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Bot, Send, User as UserIcon, RotateCcw, AlertCircle } from "lucide-react";
@@ -183,15 +189,16 @@ export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
   }
 
   return (
-    <GlassModal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Balancio AI"
-      description="Ask questions naturally and get instant financial clarity."
-      className="w-full max-w-[95vw] sm:max-w-lg"
-    >
-      <div className="flex h-[52vh] flex-col gap-4">
-        <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1 space-y-3.5 scroll-smooth">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[94vw] max-w-lg p-5 sm:p-6 rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold text-ink-primary">Balancio AI</DialogTitle>
+          <DialogDescription className="text-sm text-ink-secondary">
+            Ask questions naturally and get instant financial clarity.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex h-[48dvh] sm:h-[52vh] flex-col gap-4">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1 space-y-3.5 scroll-smooth">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -290,6 +297,7 @@ export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
           </Button>
         </form>
       </div>
-    </GlassModal>
-  );
+    </DialogContent>
+  </Dialog>
+);
 }
