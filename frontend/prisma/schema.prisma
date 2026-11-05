@@ -48,6 +48,7 @@ model GroupMember {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
+  @@index([userId])
 }
 
 model Expense {
@@ -64,6 +65,10 @@ model Expense {
   creator     User     @relation("ExpenseCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   group       Group?   @relation(fields: [groupId], references: [id], onDelete: SetNull)
   splits      Split[]
+
+  @@index([groupId])
+  @@index([creatorId])
+  @@index([date])
 }
 
 model Split {
@@ -77,6 +82,7 @@ model Split {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@unique([expenseId, userId])
+  @@index([userId])
 }
 
 model Settlement {
@@ -96,4 +102,9 @@ model Settlement {
   fromUser      User     @relation("SettlementsSent", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUser        User     @relation("SettlementsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
   createdBy     User     @relation("SettlementsCreated", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([date])
 }

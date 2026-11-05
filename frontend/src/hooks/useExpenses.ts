@@ -3,10 +3,14 @@ import { expensesApi } from "@/lib/api/expenses";
 import { queryKeys } from "@/lib/utils/query-keys";
 import type { CreateExpensePayload, ExpenseFilters, UpdateExpensePayload } from "@/types/expense";
 
-export function useExpenses(filters: ExpenseFilters = {}) {
+export function useExpenses(
+  filters: ExpenseFilters = {},
+  options: { enabled?: boolean } = {}
+) {
   return useQuery({
     queryKey: queryKeys.expenses(filters as Record<string, unknown>),
-    queryFn: () => expensesApi.list(filters)
+    queryFn: () => expensesApi.list(filters),
+    enabled: options.enabled ?? true
   });
 }
 
@@ -27,6 +31,7 @@ export function useExpense(expenseId: string | undefined) {
 function invalidateFinancialViews(queryClient: ReturnType<typeof useQueryClient>, groupId?: string) {
   queryClient.invalidateQueries({ queryKey: ["expenses"] });
   queryClient.invalidateQueries({ queryKey: ["analytics"] });
+  queryClient.invalidateQueries({ queryKey: ["dashboard"] });
   queryClient.invalidateQueries({ queryKey: queryKeys.notifications() });
   if (groupId) {
     queryClient.invalidateQueries({ queryKey: queryKeys.balances(groupId) });
@@ -49,17 +54,14 @@ export function useUpdateExpense(expenseId: string, groupId?: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: UpdateExpensePayload) => expensesApi.update(expenseId, payload),
-    onSuccess: (expense) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.expense(expenseId) });
-      invalidateFinancialViews(queryClient, groupId ?? expense.groupId);
-    }
+    onSuccess: () => invalidateFinancialViews(queryClient, groupId)
   });
 }
 
-export function useDeleteExpense(groupId?: string) {
+export function useDeleteExpense(expenseIdOrGroupId?: string, maybeGroupId?: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (expenseId: string) => expensesApi.remove(expenseId),
-    onSuccess: () => invalidateFinancialViews(queryClient, groupId)
+    mutationFn: (id?: string) => expensesApi.remove((id || expenseIdOrGroupId) as string),
+    onSuccess: () => invalidateFinancialViews(queryClient, maybeGroupId || expenseIdOrGroupId)
   });
 }

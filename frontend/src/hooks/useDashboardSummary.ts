@@ -1,9 +1,6 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { getUserGroups } from "@/lib/actions/groups";
-import { getGroupBalances } from "@/lib/actions/balances";
-import { getDashboardOverview } from "@/lib/actions/dashboard";
-import { queryKeys } from "@/lib/utils/query-keys";
+import { getDashboardSummary } from "@/lib/actions/dashboard";
 
 export interface DashboardSummary {
   youOwe: number;
@@ -14,49 +11,26 @@ export interface DashboardSummary {
   isError: boolean;
 }
 
+/**
+ * High-performance dashboard summary hook that retrieves all core stats
+ * (youOwe, youAreOwed, totalSpending, groupCount) in a single consolidated request.
+ */
 export function useDashboardSummary(): DashboardSummary {
   const { user } = useAuth();
-  const groupsQuery = useQuery({
-    queryKey: queryKeys.groups(),
-    queryFn: () => getUserGroups(),
-    enabled: Boolean(user?.id)
-  });
-  const overviewQuery = useQuery({
-    queryKey: queryKeys.analyticsOverview(),
-    queryFn: () => getDashboardOverview(),
-    enabled: Boolean(user?.id)
-  });
 
-  const groups = groupsQuery.data ?? [];
-  const balanceQueries = useQueries({
-    queries: groups.map((g) => ({
-      queryKey: queryKeys.balances(g.id),
-      queryFn: () => getGroupBalances(g.id),
-      enabled: Boolean(user?.id) && groupsQuery.isSuccess
-    }))
+  const summaryQuery = useQuery({
+    queryKey: ["dashboard", "summary", user?.id],
+    queryFn: () => getDashboardSummary(),
+    enabled: Boolean(user?.id),
+    staleTime: 30_000,
   });
-
-  const balancesLoaded = balanceQueries.every((q) => q.isSuccess);
-  const anyBalanceError = balanceQueries.some((q) => q.isError);
-
-  let youOwe = 0;
-  let youAreOwed = 0;
-  if (user && balancesLoaded) {
-    for (const q of balanceQueries) {
-      const mine = q.data?.find((b) => b.userId === user.id);
-      if (!mine) continue;
-      if (mine.netBalance > 0) youAreOwed += mine.netBalance;
-      else if (mine.netBalance < 0) youOwe += Math.abs(mine.netBalance);
-    }
-  }
 
   return {
-    youOwe,
-    youAreOwed,
-    totalSpending: overviewQuery.data?.totalSpending ?? 0,
-    groupCount: overviewQuery.data?.groupCount ?? groups.length,
-    isLoading: groupsQuery.isLoading || overviewQuery.isLoading || (groups.length > 0 && !balancesLoaded && !anyBalanceError),
-    isError: groupsQuery.isError || overviewQuery.isError
+    youOwe: summaryQuery.data?.youOwe ?? 0,
+    youAreOwed: summaryQuery.data?.youAreOwed ?? 0,
+    totalSpending: summaryQuery.data?.totalSpending ?? 0,
+    groupCount: summaryQuery.data?.groupCount ?? 0,
+    isLoading: summaryQuery.isLoading,
+    isError: summaryQuery.isError
   };
 }
-

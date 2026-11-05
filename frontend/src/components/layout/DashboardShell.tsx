@@ -1,22 +1,34 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Navbar } from "@/components/layout/Navbar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { SearchDialog } from "@/components/search/SearchDialog";
-import { ExpenseFormModal } from "@/components/expenses/ExpenseFormModal";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/layout/Logo";
-import { AiChatModal } from "@/components/ai/AiChatModal";
+
+// Lazy-load all overlay dialogs and modals to keep initial bundle size lean
+const SearchDialog = dynamic(
+  () => import("@/components/search/SearchDialog").then((m) => m.SearchDialog),
+  { ssr: false }
+);
+
+const ExpenseFormModal = dynamic(
+  () => import("@/components/expenses/ExpenseFormModal").then((m) => m.ExpenseFormModal),
+  { ssr: false }
+);
+
+const AiChatModal = dynamic(
+  () => import("@/components/ai/AiChatModal").then((m) => m.AiChatModal),
+  { ssr: false }
+);
 
 /**
  * Every route under (dashboard) requires authentication - this is where
- * that's enforced (spec section 76: unauthenticated visitors to /dashboard
- * etc. are redirected to /login). It also wires up the global Ctrl+K
- * search dialog and the mobile "+" quick-add-expense flow in exactly one
- * place instead of duplicating them per page.
+ * that's enforced. It also wires up the global Ctrl+K search dialog,
+ * mobile "+" quick-add-expense flow, and AI assistant dialog in one place.
  */
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { status } = useAuth();
@@ -66,9 +78,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <MobileBottomNav onAddExpense={() => setQuickAddOpen(true)} />
-      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+      {searchOpen && <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />}
       {quickAddOpen && <ExpenseFormModal open={quickAddOpen} onOpenChange={setQuickAddOpen} />}
-      <AiChatModal open={aiOpen} onOpenChange={setAiOpen} />
+      {aiOpen && <AiChatModal open={aiOpen} onOpenChange={setAiOpen} />}
     </div>
   );
 }

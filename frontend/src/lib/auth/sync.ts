@@ -1,7 +1,10 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "../db";
+import * as React from "react";
 
-export async function getSyncedUser() {
+const safeCache = (React as any).cache || (<T extends Function>(fn: T): T => fn);
+
+export const getSyncedUser = safeCache(async function getSyncedUser() {
   const { userId: clerkId } = auth();
   if (!clerkId) return null;
 
@@ -62,4 +65,4 @@ export async function getSyncedUser() {
     console.error("[AUTH_SYNC_DATABASE_ERROR] Database query failed during user synchronization:", err?.message || err);
     return null;
   }
-}
+});

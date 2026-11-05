@@ -1,32 +1,24 @@
 "use server";
 
-import { getSession, requireAuth } from "@/lib/auth/session";
+import { requireAuth, getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "../db";
+import * as React from "react";
 
-export async function getCurrentUserOrNull() {
-  const session = await getSession();
-  
-  if (!session?.userId) {
-    return null;
-  }
+const safeCache = (React as any).cache || (<T extends Function>(fn: T): T => fn);
 
+export const getCurrentUserOrNull = safeCache(async function getCurrentUserOrNull() {
   try {
-    const dbUser = await prisma.user.findUnique({
-      where: { id: session.userId },
-    });
-
-    if (!dbUser) {
-      return null;
-    }
+    const user = await getCurrentUser();
+    if (!user) return null;
 
     // Never leak password hash to the client
-    const { password: _, ...safeUser } = dbUser;
+    const { password: _, ...safeUser } = user;
     return safeUser;
   } catch (err: any) {
     console.error("[GET_CURRENT_USER_DB_ERROR]", err?.message || err);
     return null;
   }
-}
+});
 
 export async function getOrCreateCurrentUser() {
   const user = await getCurrentUserOrNull();

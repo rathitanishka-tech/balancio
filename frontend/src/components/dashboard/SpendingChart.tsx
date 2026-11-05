@@ -127,7 +127,9 @@ export function SpendingChartView({
 export function SpendingChart() {
   const [granularity, setGranularity] = React.useState<Granularity>("monthly");
   const trendsQuery = useAnalyticsTrends();
-  const expensesQuery = useExpenses({ limit: 100 });
+  
+  // Performance optimization: only fetch 100 expenses if user switches to weekly view
+  const expensesQuery = useExpenses({ limit: 100 }, { enabled: granularity === "weekly" });
 
   const monthlyData = (trendsQuery.data ?? []).map((t) => ({
     label: formatMonthKey(t.month),
