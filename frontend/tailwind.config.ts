@@ -100,6 +100,10 @@ const config: Config = {
           from: { opacity: "0", transform: "translate(-50%, -50%) scale(0.97)" },
           to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" }
         },
+        "search-scale-in": {
+          from: { opacity: "0", transform: "translateX(-50%) scale(0.97)" },
+          to: { opacity: "1", transform: "translateX(-50%) scale(1)" }
+        },
         "slide-up": {
           from: { opacity: "0", transform: "translateY(24px)" },
           to: { opacity: "1", transform: "translateY(0)" }
@@ -117,6 +121,7 @@ const config: Config = {
         "fade-in": "fade-in 0.35s ease-out both",
         "scale-in": "scale-in 0.2s ease-out both",
         "modal-scale-in": "modal-scale-in 0.2s ease-out both",
+        "search-scale-in": "search-scale-in 0.2s ease-out both",
         "slide-up": "slide-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both",
         shimmer: "shimmer 2.2s linear infinite",
         "pulse-soft": "pulse-soft 2s ease-in-out infinite"
