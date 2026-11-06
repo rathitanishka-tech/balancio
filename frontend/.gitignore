@@ -18,6 +18,7 @@ coverage/
 *.pem
 *.log
 npm-debug.log*
+.swc/
 
 # typescript
 *.tsbuildinfo
