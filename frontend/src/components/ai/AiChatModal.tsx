@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Bot, Send, User as UserIcon, RotateCcw, AlertCircle } from "lucide-react";
+import { useVisualViewport } from "@/hooks/useVisualViewport";
+import { useIsSmallScreen } from "@/hooks/useMediaQuery";
 import type { AiMessage } from "@/lib/actions/ai";
 
 export interface AiChatModalProps {
@@ -23,6 +25,8 @@ interface ChatMessage extends AiMessage {
 }
 
 export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
+  const isSmallScreen = useIsSmallScreen();
+  const vv = useVisualViewport();
   const [messages, setMessages] = React.useState<ChatMessage[]>([
     { role: "assistant", content: "Hey! 👋 What’s up? Want to check your expenses, balances, or who you owe?" }
   ]);
@@ -33,6 +37,16 @@ export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
   
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  // Prevent background scrolling when AI chat modal is open on small viewports
+  React.useEffect(() => {
+    if (!open || !isSmallScreen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, isSmallScreen]);
 
   // Smooth scroll tracking
   const scrollToBottom = React.useCallback(() => {
@@ -190,15 +204,26 @@ export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[94vw] max-w-lg p-5 sm:p-6 rounded-2xl">
-        <DialogHeader>
+      <DialogContent
+        className="w-[94vw] max-w-lg p-4 sm:p-6 rounded-2xl max-h-[85dvh] sm:max-h-[85vh] overscroll-contain flex flex-col"
+        style={
+          isSmallScreen && vv
+            ? {
+                top: `${vv.offsetTop + vv.height / 2}px`,
+                maxHeight: `${Math.min(560, vv.height - 24)}px`,
+                height: vv.isKeyboardOpen ? `${Math.min(560, vv.height - 24)}px` : undefined,
+              }
+            : undefined
+        }
+      >
+        <DialogHeader className="shrink-0">
           <DialogTitle className="text-lg font-semibold text-ink-primary">Balancio AI</DialogTitle>
           <DialogDescription className="text-sm text-ink-secondary">
             Ask questions naturally and get instant financial clarity.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex h-[48dvh] sm:h-[52vh] flex-col gap-4">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1 space-y-3.5 scroll-smooth">
+        <div className="flex flex-1 min-h-0 h-[42dvh] sm:h-[48vh] flex-col gap-3 sm:gap-4">
+          <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3.5 scroll-smooth overscroll-contain">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -277,7 +302,7 @@ export function AiChatModal({ open, onOpenChange }: AiChatModalProps) {
         </div>
 
         {/* Query Input Form */}
-        <form onSubmit={handleSend} className="relative flex items-center pt-2">
+        <form onSubmit={handleSend} className="relative flex shrink-0 items-center pt-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}

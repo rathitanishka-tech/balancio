@@ -37,7 +37,7 @@ const SheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 mx-auto z-50 flex max-h-[92vh] w-full flex-col gap-4 rounded-t-modal border-t border-[#DCE3ED] dark:border-[#26354B] bg-[#FFFFFF] dark:bg-[#080D18] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-[#172033] dark:text-[#E8EDF6] shadow-2xl overflow-y-auto",
+        "fixed inset-x-0 bottom-0 mx-auto z-50 flex max-h-[85dvh] sm:max-h-[92vh] w-full flex-col gap-4 rounded-t-modal border-t border-[#DCE3ED] dark:border-[#26354B] bg-[#FFFFFF] dark:bg-[#080D18] p-5 sm:p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-[#172033] dark:text-[#E8EDF6] shadow-2xl overflow-y-auto overscroll-contain",
         "data-[state=open]:animate-slide-up",
         // Desktop: centered modal
         "sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-modal sm:border sm:border-[#DCE3ED] dark:sm:border-[#26354B] sm:data-[state=open]:animate-modal-scale-in",

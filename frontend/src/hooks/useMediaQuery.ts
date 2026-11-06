@@ -22,3 +22,7 @@ export function usePrefersReducedMotion(): boolean {
 export function useIsMobile(): boolean {
   return useMediaQuery("(max-width: 767px)");
 }
+
+export function useIsSmallScreen(): boolean {
+  return useMediaQuery("(max-width: 639px)");
+}

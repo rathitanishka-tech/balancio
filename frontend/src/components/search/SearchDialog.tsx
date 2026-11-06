@@ -6,6 +6,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/common";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useIsSmallScreen } from "@/hooks/useMediaQuery";
+import { useVisualViewport } from "@/hooks/useVisualViewport";
 import { searchApi } from "@/lib/api/search";
 import { formatMoney } from "@/lib/formatters/currency";
 import { Search, Users, Receipt, User as UserIcon, HandCoins } from "lucide-react";
@@ -18,10 +20,22 @@ export interface SearchDialogProps {
 
 export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
   const router = useRouter();
+  const isSmallScreen = useIsSmallScreen();
+  const vv = useVisualViewport();
   const [query, setQuery] = React.useState("");
   const debouncedQuery = useDebounce(query, 250);
   const [results, setResults] = React.useState<SearchResults | null>(null);
   const [loading, setLoading] = React.useState(false);
+
+  // Prevent background scrolling when search dialog is open on small viewports
+  React.useEffect(() => {
+    if (!open || !isSmallScreen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, isSmallScreen]);
 
   React.useEffect(() => {
     if (!open) {
@@ -65,9 +79,18 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         hideClose
-        className="w-full sm:max-w-xl gap-0 overflow-hidden p-0 border-b sm:border border-modal-border bg-modal-bg shadow-2xl fixed inset-x-0 top-0 left-0 translate-x-0 translate-y-0 rounded-none sm:rounded-2xl sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 max-h-[85dvh] sm:max-h-[80vh]"
+        className="w-full sm:max-w-xl gap-0 overflow-hidden p-0 border-b sm:border border-modal-border bg-modal-bg shadow-2xl fixed inset-x-0 top-0 left-0 translate-x-0 translate-y-0 rounded-none sm:rounded-2xl sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 max-h-[85dvh] sm:max-h-[80vh] flex flex-col overscroll-contain"
+        style={
+          isSmallScreen && vv
+            ? {
+                top: `${vv.offsetTop}px`,
+                height: `${vv.height}px`,
+                maxHeight: `${vv.height}px`,
+              }
+            : undefined
+        }
       >
-        <div className="flex items-center gap-2.5 border-b border-modal-border px-4 py-3.5">
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-modal-border px-4 py-3.5">
           <Search className="h-4 w-4 shrink-0 text-form-placeholder" />
           <Input
             autoFocus
@@ -82,13 +105,22 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="sm:hidden text-xs font-medium text-ink-secondary hover:text-ink-primary px-1.5 py-1 rounded"
+            className="sm:hidden text-xs font-medium text-ink-secondary hover:text-ink-primary px-2 py-1 rounded hover:bg-surface-2 transition-colors min-h-[32px] min-w-[48px] flex items-center justify-center"
           >
             Cancel
           </button>
         </div>
 
-        <div className="max-h-[calc(85dvh-3.5rem)] sm:max-h-[60vh] overflow-y-auto p-2">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain p-2"
+          style={
+            isSmallScreen && vv
+              ? {
+                  maxHeight: `${Math.max(120, vv.height - 56)}px`,
+                }
+              : undefined
+          }
+        >
           {!query.trim() && (
             <p className="px-3 py-8 text-center text-sm text-ink-muted">
               Search groups, expenses, and people across everything you&apos;re authorized to see.

@@ -42,8 +42,8 @@ export function Navbar({ onOpenSearch, onOpenAi }: { onOpenSearch: () => void; o
   return (
     <GlassNavbar
       left={
-        <div className="flex items-center gap-2.5">
-          <h2 className="truncate text-base font-semibold text-ink-primary sm:text-lg">{titleFor(pathname)}</h2>
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className="truncate text-sm sm:text-lg font-semibold text-ink-primary max-w-[100px] xs:max-w-none">{titleFor(pathname)}</h2>
         </div>
       }
       right={
@@ -57,7 +57,7 @@ export function Navbar({ onOpenSearch, onOpenAi }: { onOpenSearch: () => void; o
             <Bot className="h-4 w-4" />
             Ask AI
           </Button>
-          <Button variant="ghost" size="icon" className="sm:hidden text-accent-violet" onClick={onOpenAi} aria-label="Ask AI">
+          <Button variant="ghost" size="icon" className="sm:hidden text-accent-violet h-9 w-9 min-h-[36px] min-w-[36px]" onClick={onOpenAi} aria-label="Ask AI">
             <Bot className="h-[18px] w-[18px]" />
           </Button>
 
@@ -73,7 +73,7 @@ export function Navbar({ onOpenSearch, onOpenAi }: { onOpenSearch: () => void; o
               ⌘K
             </kbd>
           </Button>
-          <Button variant="ghost" size="icon" className="sm:hidden" onClick={onOpenSearch} aria-label="Search">
+          <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 min-h-[36px] min-w-[36px]" onClick={onOpenSearch} aria-label="Search">
             <Search className="h-[18px] w-[18px]" />
           </Button>
           <ThemeToggle />
@@ -87,7 +87,7 @@ export function Navbar({ onOpenSearch, onOpenAi }: { onOpenSearch: () => void; o
               onClick={logout}
               title="Log out"
               aria-label="Log out"
-              className="text-ink-secondary hover:text-ink-primary hover:bg-surface-2"
+              className="text-ink-secondary hover:text-ink-primary hover:bg-surface-2 h-9 w-9 min-h-[36px] min-w-[36px]"
             >
               <LogOut className="h-[18px] w-[18px]" />
             </Button>

@@ -70,11 +70,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg-base bg-noise">
+    <div className="flex min-h-screen bg-bg-base bg-noise overflow-x-hidden">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Navbar onOpenSearch={() => setSearchOpen(true)} onOpenAi={() => setAiOpen(true)} />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:px-6 lg:pb-10">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-3.5 pb-28 pt-4 sm:px-6 sm:pt-6 lg:pb-10 min-w-0 overflow-x-hidden">{children}</main>
       </div>
 
       <MobileBottomNav onAddExpense={() => setQuickAddOpen(true)} />

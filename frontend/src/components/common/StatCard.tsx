@@ -28,17 +28,17 @@ const TONE_STYLES: Record<NonNullable<StatCardProps["tone"]>, string> = {
  */
 export function StatCard({ label, value, formatValue, icon, trend, tone = "default", className }: StatCardProps) {
   return (
-    <GlassCard interactive className={cn("p-5", className)}>
+    <GlassCard interactive className={cn("p-4 sm:p-5", className)}>
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm text-ink-secondary">{label}</p>
-          <p className={cn("mt-1.5 text-2xl font-semibold tracking-tight", TONE_STYLES[tone])}>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-ink-secondary truncate">{label}</p>
+          <p className={cn("mt-1.5 text-xl sm:text-2xl font-semibold tracking-tight tabular-nums break-words", TONE_STYLES[tone])}>
             <CountUp value={value} formatValue={formatValue} />
           </p>
           {trend && (
             <p
               className={cn(
-                "mt-1 flex items-center gap-1 text-xs",
+                "mt-1 flex items-center gap-1 text-xs truncate",
                 trend.direction === "up" ? "text-accent-emerald" : "text-accent-rose"
               )}
             >
