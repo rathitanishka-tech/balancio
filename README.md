@@ -1,180 +1,247 @@
-# Splitwise Frontend
+# Balancio
 
-A production-quality Next.js frontend for a Splitwise-style expense-sharing app, built in the **Liquid Obsidian** design language. It's designed to connect directly to the companion `splitwise-backend` REST API.
+A modern, full-stack expense sharing application with automated debt simplification and an AI-powered financial assistant. Built with **Next.js 14 (App Router)**, **TypeScript**, **Prisma ORM**, **PostgreSQL**, **Clerk Authentication**, and **Groq AI**, styled in the dark, sleek **Liquid Obsidian** design system.
+
+---
 
 ## Features
 
-- **Auth**: JWT login/register, protected dashboard routes, a deterministic **Explore Demo** mode that needs no backend at all
-- **Groups**: create/edit/delete, membership management (add by email, invite, remove, change role), permission-aware UI
-- **Expenses**: full CRUD, with a real **Equal / Percentage / Custom** split editor that mirrors the backend's live validation
-- **Balances & debts**: per-group balances, direct "who owes whom," and the backend's debt-simplification algorithm visualized as an animated before/after comparison
-- **Settlements**: a settle-up flow (amount, payment method, note) and settlement history
-- **Analytics**: overview, monthly (with month navigation), category and per-group breakdowns, and insights computed from the fetched data - never fabricated
-- **Notifications**: unread-count badge, mark read/unread, delete
-- **Global search**: `Ctrl/⌘+K` command palette plus a full search page
-- **Exports**: CSV/PDF download, driven entirely by the backend
-- Loading skeletons, error states (mapped by HTTP status), empty states, and confirm dialogs used consistently across every view
-- Fully responsive: sidebar + top navbar on desktop, bottom nav + floating add button on mobile, bottom-sheet modals on small screens
+- **Smart Expense Tracking**:
+  - Full expense lifecycle management (create, view, edit, delete).
+  - Multi-method splitting: **Equal**, **Percentage**, and **Custom (Exact)** split calculations with client preview and strict server-side validation.
+  - Multi-payer support with automated per-participant balance adjustment.
 
-## Tech stack
+- **Debt Simplification & Balances**:
+  - Real-time balance calculations ("who owes whom" across members and groups).
+  - Graph-based minimum-cash-flow debt simplification algorithm that reduces total settlement transactions.
 
-| Concern | Choice |
+- **Settle-Up Workflow**:
+  - Record payments between group members with customizable payment methods and notes.
+  - Complete settlement history and transaction audit logs.
+
+- **Balancio AI Assistant**:
+  - Conversational financial assistant powered by **Groq** (`llama-3.3-70b-versatile` / `llama-3.1-8b-instant`).
+  - Context-aware intent classification and parallel database retrieval for queries regarding monthly spend, unsettled balances, and group debts.
+  - Progressive token streaming via Server-Sent Events (SSE).
+
+- **Authentication & Security**:
+  - Managed authentication powered by **Clerk** (`@clerk/nextjs`).
+  - Edge-level route protection via Next.js Middleware.
+  - Strict tenant isolation and group membership checks across all Server Actions.
+  - Parameterized database access with Prisma ORM (zero raw SQL injection surface).
+
+- **Analytics & Search**:
+  - Visual charts powered by Recharts (monthly spending trends, category breakdowns, net balance summaries).
+  - Global Command Palette (`Ctrl/⌘ + K`) for instant navigation and resource search.
+
+- **Responsive Mobile Experience**:
+  - Optimized for mobile and desktop viewports.
+  - Virtual keyboard-aware search overlay and modal dialogs using dynamic viewport units (`100dvh`, `window.visualViewport`).
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
 |---|---|
-| Framework | Next.js 14 (App Router) + React 18 + TypeScript (strict) |
-| Styling | Tailwind CSS v3 + hand-authored shadcn-style primitives on Radix UI |
-| Server state | TanStack Query v5 |
-| Forms | React Hook Form + Zod |
-| Charts | Recharts |
-| Icons | lucide-react |
-| Toasts | Sonner |
-| Font | [Geist](https://www.npmjs.com/package/geist) (self-hosted, no network fetch at build time) |
-| Testing | Jest (`next/jest`) + React Testing Library |
+| **Framework** | Next.js 14.2 (App Router, Server Actions, Route Handlers) |
+| **Language** | TypeScript (Strict mode) |
+| **Styling & UI** | Tailwind CSS v3, Radix UI Primitives, Lucide Icons, Sonner |
+| **Design Language** | Liquid Obsidian (Dark mode, glassmorphic panels, subtle borders) |
+| **Database & ORM** | PostgreSQL (Supabase / Neon) + Prisma ORM 5.x |
+| **Authentication** | Clerk (`@clerk/nextjs`) |
+| **AI Engine** | Groq SDK (`groq-sdk`) |
+| **Forms & Validation**| React Hook Form + Zod |
+| **Charts** | Recharts |
+| **Testing** | Jest (`next/jest`) + React Testing Library (136 tests, 18 suites) |
 
-**Version notes (deliberate, documented choices):**
-- **Next.js 14, not 15/16.** Next 15+ was available, but pinning 14 avoided taking on the React 19 / Next 15 ecosystem-wide migration this late in a large build, in favor of a combination with very well-established behavior. One consequence: `next.config.ts` isn't supported until Next 15, so config lives in **`next.config.mjs`** instead (same content, different extension - see the comment in that file).
-- **Geist instead of next/font/google's Inter.** This sandboxed build environment has no network access to `fonts.googleapis.com`, so `next/font/google` would fail at build time. The `geist` npm package ships its font files locally and needs no network fetch, and was one of the two fonts the spec suggested - no compromise on the actual typography.
-- **Tailwind v3, not v4.** v4 replaces the JS config file with a CSS-first config model; the spec explicitly asks for a `tailwind.config.ts` file, so v3 was the better fit.
+---
 
 ## Architecture
 
-```
-Pages (App Router)  →  Hooks (TanStack Query)  →  lib/api/*  →  lib/api/client.ts  →  splitwise-backend
-                              ↑                         ↓
-                        Zod validation           lib/demo/* (when Explore Demo is active)
-```
-
-- **`lib/api/client.ts`** is the *only* place that calls `fetch`. Every other module in `lib/api/` (one file per backend resource) goes through it, attaches the JWT, and normalizes every failure into a single `ApiError` shape. No component ever calls `fetch` directly.
-- **`hooks/*`** wrap TanStack Query around `lib/api/*` - one hook file per resource, matching the spec's required set (`useAuth`, `useGroups`, `useExpenses`, `useBalances`, `useDebts`, `useSettlements`, `useAnalytics`, `useNotifications`). Mutations invalidate every view a financial change can affect (see `hooks/useExpenses.ts` for the clearest example: creating an expense invalidates the expense list, this group's balances/debts, analytics, and notifications together).
-- **Server state vs UI state**: everything from the backend lives in TanStack Query's cache (never duplicated into React context or global state). Purely local UI state (modal open/closed, the selected split type mid-edit, the search dialog) is plain `useState`/component state - see `providers/` for the only two things that *are* global: auth and the query client.
-- **The backend is the only source of truth for money.** The frontend never computes a balance or a debt - `SplitTypeSelector`'s live totals are clearly commented as a *preview* to give immediate form feedback; the actual `POST /expenses` call sends raw participant input, and the shares that get stored come back from the backend's response.
-- **Demo mode** (`lib/demo/`): a `localStorage` flag that every `lib/api/*` module checks first. When active, each module returns a fixture from `lib/demo/data.ts` instead of calling `client.ts`. The fixture data was computed and verified by hand so that every group's balances actually sum to zero and the featured debt-simplification example is mathematically consistent - it isn't random, and it isn't disconnected from what the rest of the UI shows.
-
-## Folder structure
+Balancio is structured as a full-stack Next.js 14 application:
 
 ```
-src/
-├── app/
-│   ├── layout.tsx, page.tsx (landing), loading.tsx, error.tsx, not-found.tsx
-│   ├── (auth)/                    # login, register, forgot-password (own layout, redirects if already authenticated)
-│   └── (dashboard)/               # every authenticated route (own layout: sidebar + navbar + mobile nav + route guard)
-│       ├── dashboard/
-│       ├── groups/ , groups/[groupId]/{expenses,balances,members,analytics}/
-│       ├── expenses/ , expenses/[expenseId]/
-│       ├── settlements/ , analytics/ , notifications/ , search/ , settings/ , profile/
-│
-├── components/
-│   ├── ui/            # hand-authored shadcn-style primitives (Button, Input, Dialog, Select, Tabs, DropdownMenu, ...)
-│   ├── glass/          # the spec's required Liquid Obsidian components: GlassCard, GlassPanel, LiquidButton,
-│   │                   #   GlassInput, GlassSelect, GlassModal, GlassDropdown, GlassTabs, GlassSidebar, GlassNavbar
-│   ├── layout/         # Sidebar, Navbar, MobileBottomNav, DashboardShell (route guard + Ctrl+K + quick-add), Logo, UserMenu
-│   ├── common/         # StatCard, MemberAvatar, MemberList, EmptyState, ErrorState, LoadingSkeleton, ConfirmDialog, PageHeader, CountUp
-│   └── dashboard/ groups/ expenses/ balances/ debts/ settlements/ analytics/ notifications/ search/ profile/ settings/
-│
-├── hooks/              # useAuth, useGroups, useExpenses, useBalances, useDebts, useSettlements, useAnalytics, useNotifications, + useMediaQuery/useDebounce/useDashboardSummary
-│
-├── lib/
-│   ├── api/            # client.ts, errors.ts, auth.ts, users.ts, groups.ts, expenses.ts, balances.ts, debts.ts, settlements.ts, analytics.ts, notifications.ts, search.ts, exports.ts
-│   ├── auth/           # token.ts (localStorage JWT persistence)
-│   ├── demo/           # mode.ts, data.ts (deterministic fixtures)
-│   ├── formatters/     # currency.ts, date.ts
-│   ├── validations/    # Zod schemas: auth, group, expense, settlement, profile
-│   └── utils/          # cn.ts, constants.ts, query-keys.ts
-│
-├── providers/          # QueryProvider.tsx, AuthProvider.tsx
-├── types/              # user, group, expense, balance, debt, settlement, notification, analytics, search, api
-└── styles/globals.css  # Liquid Obsidian design tokens
-
-tests/                  # validations/, formatters/, lib/, components/
+Browser / Client Components
+            │
+            ▼
+Next.js Edge Middleware (Clerk Session Guard)
+            │
+    ┌───────┴────────────────────────┐
+    ▼                                ▼
+Server Actions (`src/lib/actions/*`)   Route Handlers (`src/app/api/*`)
+    │                                │
+    ├───────────┐                    ├───────────┐
+    ▼           ▼                    ▼           ▼
+Prisma ORM   Supabase DB          Groq SDK   Streaming AI
+(PostgreSQL) (Pooled Conn)        (Llama-3)   Response
 ```
 
-## Environment setup
+- **Server Actions**: All mutations and database queries (`expenses.ts`, `groups.ts`, `settlements.ts`, `balances.ts`) run securely on the server with user-session caller verification.
+- **Prisma Client Singleton**: Global Prisma instance configured with connection pooling (`pgbouncer`) and automatic connection reuse.
+- **Edge Middleware**: Evaluates authentication before requests reach application route trees.
+
+---
+
+## Repository Structure
+
+```
+balancio/
+├── frontend/                     # Full-stack Next.js application
+│   ├── prisma/
+│   │   └── schema.prisma         # PostgreSQL schema and relation models
+│   ├── public/                   # Static branding assets and icons
+│   ├── src/
+│   │   ├── app/                  # Next.js App Router
+│   │   │   ├── (auth)/           # Authentication routes (login, register)
+│   │   │   ├── (dashboard)/      # Gated dashboard, groups, expenses, analytics
+│   │   │   └── api/ai/chat/      # Groq AI streaming route handler
+│   │   ├── components/           # UI components (glass, ui, expenses, groups, ai)
+│   │   ├── hooks/                # Custom hooks & TanStack Query hooks
+│   │   ├── lib/
+│   │   │   ├── actions/          # Server Actions (database operations)
+│   │   │   ├── ai/               # Groq client, intent parser, prompt builder
+│   │   │   ├── db.ts             # Prisma client instance
+│   │   │   ├── formatters/       # Currency and date helpers
+│   │   │   └── validations/      # Zod validation schemas
+│   │   └── middleware.ts         # Edge authentication middleware
+│   └── tests/                    # Jest test suites
+├── package.json                  # Root proxy scripts
+└── README.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js**: v18.18.0 or newer
+- **npm**: v9 or newer
+- **PostgreSQL Database**: Supabase, Neon, or local PostgreSQL instance
+- **Clerk Account**: For application authentication
+- **Groq API Key**: For Balancio AI
+
+### 1. Clone & Install
+
+Clone the repository and install dependencies:
 
 ```bash
-cp .env.example .env.local
+git clone https://github.com/rathitanishka-tech/balancio.git
+cd balancio
+npm run install-all
 ```
 
-```
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-```
+*(Or `npm install` within both the root and `frontend/` directory).*
 
-This is the only environment variable the app needs, and it's intentionally `NEXT_PUBLIC_*` since the browser calls the backend directly - no secrets live here or anywhere else in client code.
+### 2. Environment Variables
 
-## Backend connection
-
-Point `NEXT_PUBLIC_API_URL` at a running `splitwise-backend` (see the sibling project). Every request goes through `lib/api/client.ts`, which attaches `Authorization: Bearer <jwt>` automatically once you're logged in.
-
-**One route adaptation worth knowing about:** the spec's assumed contract listed exports at `/api/export/groups/:groupId/csv`. The actual backend built alongside this frontend exposes them nested under the group instead, at `/api/groups/:groupId/export/csv` (consistent with its other group sub-resources like `/balances` and `/debts`). `lib/api/exports.ts` targets the real route and documents this in a comment - exactly the "adapter layer" approach the spec calls for when a backend's actual shape differs slightly from what was assumed, so nothing outside that one file needed to know about it.
-
-If you don't have a backend running yet, click **Explore Demo** on the login page or landing page - the whole app works against the local, deterministic fixture data instead.
-
-## Running locally
+Create a `.env.local` file inside the `frontend/` directory:
 
 ```bash
-npm install
+cp frontend/.env.example frontend/.env.local
+```
+
+Configure the following variables in `frontend/.env.local`:
+
+```env
+# Database Configuration (PostgreSQL / Supabase / Neon)
+POSTGRES_PRISMA_URL="postgresql://user:password@host:6543/postgres?sslmode=require&pgbouncer=true"
+POSTGRES_URL_NON_POOLING="postgresql://user:password@host:5432/postgres?sslmode=require"
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/register
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# Groq AI Assistant
+GROQ_API_KEY=gsk_...
+GROQ_MODEL=llama-3.3-70b-versatile
+```
+
+### 3. Database Migration & Prisma Client
+
+Generate the Prisma client:
+
+```bash
+cd frontend
+npx prisma generate
+```
+
+To sync your database schema:
+
+```bash
+npx prisma db push
+```
+
+### 4. Run Development Server
+
+From the repository root:
+
+```bash
 npm run dev
 ```
 
-Opens on `http://localhost:3000`. With no backend reachable, every page still renders correctly and shows proper error states (see `components/common/ErrorState.tsx`) rather than crashing - or just use Explore Demo to see the app fully populated.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Authentication
-
-`providers/AuthProvider.tsx` holds the current user and auth status (`loading` / `authenticated` / `unauthenticated`), persists the JWT via `lib/auth/token.ts` (a single localStorage wrapper), and registers a global 401 handler with the API client so that an expired/invalid token anywhere in the app triggers a clean logout. `components/layout/DashboardShell.tsx` is where every `(dashboard)` route is actually gated - unauthenticated visitors are redirected to `/login`; the `(auth)` layout does the inverse (an already-logged-in visitor to `/login` is redirected to `/dashboard`).
-
-Structured for real OAuth later: `AuthProvider` exposes `login`/`register`/`enterDemo` as the only ways components change auth state, all funneling through `lib/api/auth.ts`. Adding Google/Auth.js would mean adding one more method there (e.g. `loginWithGoogle`) - no other file in the app would need to change.
-
-## API integration
-
-Every backend resource has its own file in `lib/api/`, and every response type is a real TypeScript interface in `types/` - nothing from the backend is typed `any`. See "Architecture" above for the request flow and the demo-mode fallback.
+---
 
 ## Testing
 
+The project includes an automated test suite verifying form validations, financial calculations, protected route guards, and AI context assembly.
+
 ```bash
+cd frontend
+
+# Run all test suites
 npm test
+
+# Run tests in watch mode
 npm run test:watch
 ```
 
-**80 tests across 13 suites**, covering exactly what the spec asked for:
-- Login and registration form validation (`tests/components/LoginPage.test.tsx`, `tests/validations/auth.test.ts`)
-- Expense form validation for all three split types - equal, percentage, custom (`tests/validations/expense.test.ts`, `tests/components/SplitTypeSelector.test.tsx`)
-- API error handling and status-code-to-message mapping (`tests/lib/api-client.test.ts`, `tests/components/ErrorState.test.tsx`)
-- Protected routes (`tests/components/ProtectedRoute.test.tsx`)
-- Balance display (`tests/components/BalanceDisplay.test.tsx`)
-- The settlement flow (`tests/components/SettleUpModal.test.tsx`)
-- Notification read/unread state (`tests/components/NotificationItem.test.tsx`)
-- Currency/date formatters and settlement/group validation schemas
+**Test Coverage**: **18 test suites**, **136 unit & integration tests** passing.
 
-One real bug was caught and fixed by this suite: several `<input type="email">`/`type="number"` fields let the browser's native HTML5 constraint validation intercept form submission before React Hook Form's Zod validation ever ran, which would have shown the browser's generic tooltip instead of this app's custom error copy. Every form now sets `noValidate` so the app's own validation is what users actually see.
+---
 
-## Build
+## Production Build
+
+To run typechecking and build the production bundle:
 
 ```bash
+# Typecheck
+cd frontend
+npx tsc --noEmit
+
+# Production build
 npm run build
-npm run lint
 ```
 
-Both are clean: `next build` type-checks the whole project, runs ESLint, and statically generates all 16 prerenderable routes (the rest - anything under `[groupId]`/`[expenseId]` - are correctly marked dynamic). `npm run lint` reports no errors.
+To test the production build locally:
 
-## Deployment
+```bash
+npm run start
+```
 
-`npm run build && npm start` runs the production server. This is a standard Next.js app - it deploys as-is to Vercel, or as a Node server anywhere else. Set `NEXT_PUBLIC_API_URL` to the deployed backend's URL in your hosting provider's environment configuration before building.
+---
 
-### CRITICAL: Clerk Authentication in Production (Vercel)
+## Deployment (Vercel)
 
-If you deploy to a free Vercel domain (`*.vercel.app`) using Clerk **Live** keys, your application will fail to load Clerk (`net::ERR_CONNECTION_CLOSED`) and all authenticated API routes (like `/api/chat`) will return `401 Unauthorized`. 
+1. **Import Project**: Link your GitHub repository in the Vercel dashboard.
+2. **Root Directory**: Set the root directory to `frontend`.
+3. **Framework Preset**: Next.js.
+4. **Environment Variables**: Add all variables from your `frontend/.env.local` to Vercel's Environment Variables settings.
+5. **Deploy**: Trigger deployment.
 
-**Why?** Clerk Live keys demand a CNAME DNS record (e.g., `clerk.your-domain.com`). Vercel does not allow custom DNS records on their free `.vercel.app` subdomains. Therefore, the connection to the Clerk frontend API is forcefully closed by Vercel's edge network.
+### Note on Clerk Keys in Production
+- On free `*.vercel.app` domains, use Clerk **Development/Test keys** (`pk_test_...` and `sk_test_...`).
+- For Clerk **Live/Production keys** (`pk_live_...`), you must assign a custom domain (e.g. `balancio.com`) and configure the required CNAME DNS records provided in your Clerk dashboard.
 
-**The Fix:**
-You must choose one of the following before deploying:
-1. **Use Test Keys:** Change your Vercel Environment Variables to use your Clerk **Development** keys (`pk_test_...` and `sk_test_...`). These do not require custom DNS and work perfectly on `.vercel.app` domains.
-2. **Use a Custom Domain:** Buy a custom domain (e.g., `balancio.com`), assign it to your Vercel project, and configure the 3 CNAME records provided by your Clerk dashboard. Update your Clerk dashboard's domain settings to match your new domain.
+---
 
-*Note: Any time you update environment variables in Vercel (`NEXT_PUBLIC_*`), you MUST trigger a new deployment for them to be baked into the JavaScript bundle.*
+## License
 
-## Future improvements
-
-- Real-time updates via WebSockets (the TanStack Query invalidation pattern already used throughout is exactly the seam a WebSocket event handler would hook into - see spec section 75)
-- A real password-reset endpoint (the forgot-password page's UI and validation are complete, but honestly disabled - see the comment in `app/(auth)/forgot-password/page.tsx` - since the backend doesn't expose this yet)
-- Receipt upload/preview in the expense form (the backend's attachment endpoints exist; the form doesn't yet have a file picker wired to them)
-- Optimistic updates for settlement creation and notification read-state, rather than waiting for the round trip
-- E2E tests (Playwright/Cypress) covering the full create-group → add-expense → settle flow against a live backend.
+This project is licensed under the MIT License.
