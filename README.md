@@ -1,5 +1,8 @@
 # Balancio
 
+[![Live Demo](https://img.shields.io/badge/Live_App-balancio--black.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://balancio-black.vercel.app/)  
+🌐 **Live URL**: [https://balancio-black.vercel.app/](https://balancio-black.vercel.app/)
+
 A modern, full-stack expense sharing application with automated debt simplification and an AI-powered financial assistant. Built with **Next.js 14 (App Router)**, **TypeScript**, **Prisma ORM**, **PostgreSQL**, **Clerk Authentication**, and **Groq AI**, styled in the dark, sleek **Liquid Obsidian** design system.
 
 ---
@@ -229,6 +232,8 @@ npm run start
 ---
 
 ## Deployment (Vercel)
+
+The production application is deployed live at: **[https://balancio-black.vercel.app/](https://balancio-black.vercel.app/)**
 
 1. **Import Project**: Link your GitHub repository in the Vercel dashboard.
 2. **Root Directory**: Set the root directory to `frontend`.
